@@ -21,7 +21,7 @@ cv= ass.get_cv()
 dzsum = ass.get_dzsum()
 
 #time discretization
-dt   = 0.1
+dt   = 0.5
 TIME = 100
 t = np.arange(0,TIME+dt,dt)
 cols = len(t)

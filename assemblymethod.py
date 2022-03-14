@@ -9,8 +9,8 @@ import layermethod as lm
 #für beliebige Erweiterung: in: vektorliste; out: zusammengesetzte vektoren. 
 #0:upper, 1:lower boundary (gemessen von oben)
 
-layer0 = lm.layer(0,2,0.04,0.3)
-layer1 = lm.layer(2,3,0.04,0.3)
+layer0 = lm.layer(0,2,0.5,0.3)
+layer1 = lm.layer(2,3,0.5,0.3)
 
 
 class assembly:
