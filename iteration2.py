@@ -54,9 +54,9 @@ factor12u= np.zeros((rows,))
 factor12l= np.zeros((rows,))
 
 #dzn[:] = np.array(dz)
-factor12[1:rows] = np.array(((1+k[2:rows]/k[1:rows-1])/(1+cv[1:rows-1]*k[2:rows]/cv[2:rows]/k[1:rows-1]))* cv[1:rows-1] * dt/dz[1:rows-1]**2)
-factor12u[1:rows]= np.array(2*k[2:rows]/(k[2:rows]+k[1:rows-1]))
-factor12l[1:rows]= np.array(2*k[1:rows-1]/(k[2:rows]+k[1:rows-1]))
+factor12[1:rows-1] = np.array(((1+k[2:rows]/k[1:rows-1])/(1+cv[1:rows-1]*k[2:rows]/cv[2:rows]/k[1:rows-1]))* cv[1:rows-1] * dt/dz[1:rows-1]**2)
+factor12u[1:rows-1]= np.array(2*k[2:rows]/(k[2:rows]+k[1:rows-1]))
+factor12l[1:rows-1]= np.array(2*k[1:rows-1]/(k[2:rows]+k[1:rows-1]))
 
 
 #iteration zeitvektoren
