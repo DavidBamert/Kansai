@@ -67,4 +67,4 @@ for j in range(0, cols):
     B[1:rows-1] = factor12[1:rows-1]*(factor12u[1:rows-1]*A[:rows-2] - 2*A[1:rows-1] + factor12l[1:rows-1]*A[2:rows]) + A[1:rows-1]  
     A = B.copy()
     
-    
+plt.show()

@@ -69,3 +69,4 @@ for j in range(0, cols):
     A = B.copy()
     
     
+plt.show()

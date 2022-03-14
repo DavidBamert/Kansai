@@ -39,7 +39,8 @@ class layer:
         rows = int((self.hlow-self.hup)/dz)
         dzcorr = (self.hlow-self.hup)/rows
         return dzcorr
-    
+
+        #ist nötig für den plot, deil dz von layer zu layer anders ist.
     def get_dzsummed(self):
         dzsumvect = np.arange(0,self.hlow-self.hup+self.dzcorr(),self.dzcorr())
         return dzsumvect
