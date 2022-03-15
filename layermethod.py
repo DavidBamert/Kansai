@@ -44,9 +44,8 @@ class layer:
     def get_dzsummed(self):
         dzsumvect = np.arange(0,self.hlow-self.hup+self.dzcorr(),self.dzcorr())
         return dzsumvect
-        """
-        Vektoren für die Iteration
-        """
+
+        #Vektoren für die Iteration
     def get_dzvect(self):
         dzvect = self.get_dzsummed()
         dzvect[:] = self.dzcorr()
@@ -62,10 +61,8 @@ class layer:
         cvvect = self.get_dzsummed()
         cvvect[:] = cv
         return cvvect 
-        
-        """
-        zur kontrolle
-        """
+
+        #zur kontrolle
     def prnt_vect(self):
         dzvect = self.get_dzvect()
         kvect = self.get_kvect()
