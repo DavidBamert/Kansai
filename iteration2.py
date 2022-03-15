@@ -47,6 +47,10 @@ k1s = k[2:rows]
 cv0s = cv[1:rows-1]
 cv1s = cv[2:rows]
 """
+up = slice(0,rows-2)
+zero = slice(1,rows-1)
+lo = slice(2, rows)
+
 # factor vectors must be the same length as the dzsum vector
 
 factor12 = np.zeros((rows,))
@@ -54,9 +58,9 @@ factor12u= np.zeros((rows,))
 factor12l= np.zeros((rows,))
 
 #dzn[:] = np.array(dz)
-factor12[1:rows-1] = np.array(((1+k[2:rows]/k[1:rows-1])/(1+cv[1:rows-1]*k[2:rows]/cv[2:rows]/k[1:rows-1]))* cv[1:rows-1] * dt/dz[1:rows-1]**2)
-factor12u[1:rows-1]= np.array(2*k[2:rows]/(k[2:rows]+k[1:rows-1]))
-factor12l[1:rows-1]= np.array(2*k[1:rows-1]/(k[2:rows]+k[1:rows-1]))
+factor12[zero] = np.array(((1 + k[lo] / k[zero]) / (1 + cv[zero] * k[lo] / cv[lo] / k[zero])) * cv[zero] * dt / dz[zero] ** 2)
+factor12u[zero]= np.array(2 * k[lo] / (k[lo] + k[zero]))
+factor12l[zero]= np.array(2 * k[zero] / (k[lo] + k[zero]))
 
 
 #iteration zeitvektoren
@@ -64,7 +68,7 @@ for j in range(0, cols):
     #plot von A, direkt GGÜ dzsum (dz ändert sich so immer genau richtig)
     plt.plot(A[:],-dzsum)
     #Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
-    B[1:rows-1] = factor12[1:rows-1]*(factor12u[1:rows-1]*A[:rows-2] - 2*A[1:rows-1] + factor12l[1:rows-1]*A[2:rows]) + A[1:rows-1]  
+    B[zero] = factor12[zero] * (factor12u[zero] * A[up] - 2 * A[zero] + factor12l[zero] * A[lo]) + A[zero]
     A = B.copy()
     
 plt.show()
