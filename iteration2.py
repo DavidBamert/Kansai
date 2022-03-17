@@ -8,67 +8,86 @@ import layermethod as lm
 import numpy as np
 import matplotlib.pyplot as plt
 
-"""
-create 2 layers : wie kann ich das hier machen
-"""
+#discretizazion
+#damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
+dz = 0.5
+dt = 0.5
 
-#get all vectors
-ass = am.assembly(2)
+#fill Layerlist with Layers, from top to bottom
+#lm.layer(hup, hlow, k, me, dz), hup und hlow von oben gemessen(+)
 
+L = [lm.Layer(0,10,0.9,0.3,dz),
+    lm.Layer(10,20,0.09,0.3,dz),
+    lm.Layer(20,30,0.09,0.3,dz),
+    lm.Layer(30,40,0.9,0.3,dz)
+    ]
+
+#throw L into Assembly method
+ass = am.Assembly(L,dt)
+
+#get all the iteration vektors
 dz = ass.get_dz()
 k = ass.get_k()
 cv= ass.get_cv()
 dzsum = ass.get_dzsum()
 
 #time discretization
-dt   = 0.5
 TIME = 1000
 t = np.arange(0,TIME+dt,dt)
 cols = len(t)
 
-# IC, create B and A 
+# IC, create B and A
 rows = len(dz)
 A = np.zeros((rows,))
 B = np.zeros((rows,))
 
+#IC
 A[:] = 1
 
-#BC,
-A[0] = 0
-A[-1] = 0
+#BCs, [upper, lower] #BC muss in A und B geändert werden. (weil nur in slice 'zero' iteriert wird)
+bcs = [0, 0]
+
+A[0], B[0] = bcs[0], bcs[0]
+A[-1], B[-1] = bcs[1], bcs[1]
+
 
 """
 ITERATION FORWARD-DIFFERENCE METHOD !factor must be <0.5; 
-k0:k in layer
-k1:k in layer below
-#relevant slices
-k0s = k[1:rows-1]
-k1s = k[2:rows]
-cv0s = cv[1:rows-1]
-cv1s = cv[2:rows]
+up = i-1
+zero = i
+lo = i+1
 """
+
 up = slice(0,rows-2)
 zero = slice(1,rows-1)
 lo = slice(2, rows)
 
 # factor vectors must be the same length as the dzsum vector
 
-factor12 = np.zeros((rows,))
-factor12u= np.zeros((rows,))
-factor12l= np.zeros((rows,))
+fv = np.zeros((rows,))
+f1= np.zeros((rows,))
+f2= np.zeros((rows,))
 
 #dzn[:] = np.array(dz)
-factor12[zero] = np.array( ( (1+k[lo]/k[zero]) / (1+cv[zero]*k[lo]/cv[lo]/k[zero]) ) *cv[zero]*dt/dz[zero]**2 )
-factor12u[zero]= np.array( 2*k[lo] / (k[lo]+k[zero]) )
-factor12l[zero]= np.array( 2*k[zero] / (k[lo]+k[zero]) )
+fv[zero] = np.array(((1 + k[zero] / k[lo]) / (1 + cv[lo] * k[zero] / cv[zero] / k[lo])) * cv[lo] * dt / dz[zero] ** 2)
+f1[zero]= np.array(2 * k[zero] / (k[lo] + k[zero]))
+f2[zero]= np.array(2 * k[lo] / (k[lo] + k[zero]))
 
+# complete the first and last entry
+fv[0],fv[-1] = fv[1],fv[-2]
+f1[0],f1[-1] = f1[1],f1[-2]
+f2[0],f2[-1] = f2[1],f2[-2]
 
 #iteration zeitvektoren
 for j in range(0, cols):
     #plot von A, direkt GGÜ dzsum (dz ändert sich so immer genau richtig)
     plt.plot(A[:],-dzsum)
     #Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
-    B[zero] = factor12[zero] * ( factor12u[zero]*A[up] - 2*A[zero] + factor12l[zero]*A[lo] ) + A[zero]
+    B[zero] = fv[zero] * (f1[zero]*A[up] - 2*A[zero] + f2[zero]*A[lo]) + A[zero]
     A = B.copy()
-    
+
+#kontrolle der faktoren !<0.5
+print('factors for each layer !<0.5')
+ass.prnt_factors()
+
 plt.show()
