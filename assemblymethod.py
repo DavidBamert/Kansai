@@ -9,37 +9,41 @@ import layermethod as lm
 #für beliebige Erweiterung: in: vektorliste; out: zusammengesetzte vektoren. 
 #0:upper, 1:lower boundary (gemessen von oben)
 
-layer0 = lm.layer(0,2,0.5,0.3)
-layer1 = lm.layer(2,3,0.5,0.3)
-
-
-class assembly:
-    def __init__(self,vectors):
-        self.vectors = vectors
-        
-        """
-        bei dzsum ist wichtig, dass der Vektor keine Stelle wiederholt-> sichtbar als sprung im plot. Deshalb +layer1.height() +layer1.dzcorr()
-        """
+class Assembly:
+    def __init__(self, layerlist, dt):
+        self.layerlist = layerlist
+        self.dt = dt
+        #dzsum hilft, die kurven unverzerrt zu plotten
     def get_dzsum(self):
-        a,b = layer0.get_dzsummed(),layer1.get_dzsummed()+layer0.height()+layer0.dzcorr()
-        cv = np.concatenate((a,b))
-        return cv        
-    
+        array = np.empty((0,),float)
+        hlow = 0
+        for L, (layer) in enumerate(self.layerlist):
+            b = layer.get_dzsummed() + hlow
+            array = np.concatenate((array , b))
+            hlow = layer.hlow
+        return array
+        #folgend die vektoren, die für die iteration gebraucht werden
     def get_dz(self):
-        a,b = layer0.get_dzvect(),layer1.get_dzvect()
-        dz = np.concatenate((a,b))
-        return dz
-            
+        array = np.empty((0,),float)
+        for L, (layer) in enumerate(self.layerlist):
+            b = layer.get_dzvect()
+            array = np.concatenate((array , b))
+        return array
+
     def get_k(self):
-        a,b = layer0.get_kvect(),layer1.get_kvect()
-        k = np.concatenate((a,b))
-        return k
-        
+        array = np.empty((0,),float)
+        for L, (layer) in enumerate(self.layerlist):
+            b = layer.get_kvect()
+            array = np.concatenate((array , b))
+        return array
+
     def get_cv(self):
-        a,b = layer0.get_cvvect(),layer1.get_cvvect()
-        cv = np.concatenate((a,b))
-        return cv
-    
+        array = np.empty((0,),float)
+        for L, (layer) in enumerate(self.layerlist):
+            b = layer.get_cvvect()
+            array = np.concatenate((array , b))
+        return array
+        #methode zum print aller vektoren, für kontrolle
     def prnt_vect(self):
         dzsum= self.get_dzsum()
         dz = self.get_dz()
@@ -49,17 +53,9 @@ class assembly:
         print(dz)
         print(k)
         print(cv)
-        
+        #methode zum print aller factors der layers
+    def prnt_factors(self):
+        for L, (layer) in enumerate(self.layerlist):
+            factor= layer.cv()*self.dt/layer.dzcorr()**2
+            print(round(factor,4))
 
-
-
-"""
-nur zur kontrolle
-"""
-
-dt=0.1
-factor0= layer0.cv()*dt/layer0.dzcorr()**2
-factor1= layer1.cv()*dt/layer1.dzcorr()**2
-print('Faktoren für die verschiedenen Layers !<0.5')
-print(factor0)
-print(factor1)
