@@ -10,16 +10,14 @@ import matplotlib.pyplot as plt
 
 #discretizazion
 #damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
-dz = 0.5
-dt = 0.5
+dz = 0.3
+dt = 0.3
 
 #fill Layerlist with Layers, from top to bottom
 #lm.layer(hup, hlow, k, me, dz), hup und hlow von oben gemessen(+)
 
-L = [lm.Layer(0,10,0.9,0.3,dz),
-    lm.Layer(10,20,0.09,0.3,dz),
-    lm.Layer(20,30,0.09,0.3,dz),
-    lm.Layer(30,40,0.9,0.3,dz)
+L = [lm.Layer(0,10,1,0.3,dz),
+    lm.Layer(10,20,1,0.3,dz),
     ]
 
 #throw L into Assembly method
@@ -78,13 +76,18 @@ fv[0],fv[-1] = fv[1],fv[-2]
 f1[0],f1[-1] = f1[1],f1[-2]
 f2[0],f2[-1] = f2[1],f2[-2]
 
+
 #iteration zeitvektoren
+tt = 0
+
 for j in range(0, cols):
     #plot von A, direkt GGÜ dzsum (dz ändert sich so immer genau richtig)
     plt.plot(A[:],-dzsum)
     #Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
     B[zero] = fv[zero] * (f1[zero]*A[up] - 2*A[zero] + f2[zero]*A[lo]) + A[zero]
     A = B.copy()
+    #timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
+    tt += dz
 
 #kontrolle der faktoren !<0.5
 print('factors for each layer !<0.5')
