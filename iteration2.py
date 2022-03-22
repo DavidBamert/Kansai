@@ -10,14 +10,15 @@ import matplotlib.pyplot as plt
 
 #discretizazion
 #damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
-dz = 0.3
-dt = 0.3
+dz = 0.5
+dt = 0.5
 
 #fill Layerlist with Layers, from top to bottom
 #lm.layer(hup, hlow, k, me, dz), hup und hlow von oben gemessen(+)
 
-L = [lm.Layer(0,10,1,0.3,dz),
-    lm.Layer(10,20,1,0.3,dz),
+L = [lm.Layer(0, 10, 0.2, 0.3, dz),
+    lm.Layer(10, 20, 1, 0.3, dz),
+    lm.Layer(20, 30, 0.2, 0.3, dz),
     ]
 
 #throw L into Assembly method
@@ -30,7 +31,7 @@ cv= ass.get_cv()
 dzsum = ass.get_dzsum()
 
 #time discretization
-TIME = 1000
+TIME = 10000
 t = np.arange(0,TIME+dt,dt)
 cols = len(t)
 
@@ -76,18 +77,24 @@ fv[0],fv[-1] = fv[1],fv[-2]
 f1[0],f1[-1] = f1[1],f1[-2]
 f2[0],f2[-1] = f2[1],f2[-2]
 
-
-#iteration zeitvektoren
+#FOR LOOP
 tt = 0
 
+#plottimes: 11 evenly spaced points in time !only works with dt=0.5 or dt=1.0
+plottimes = np.arange(0,TIME+dt,TIME/10)
+
+
 for j in range(0, cols):
+    #plot times of interest
     #plot von A, direkt GGÜ dzsum (dz ändert sich so immer genau richtig)
-    plt.plot(A[:],-dzsum)
+    if any(tt == plottimes):
+        plt.plot(A[:],-dzsum)
+    #iteration zeitvektoren:CALCULATING NEXT TIME STEP
     #Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
     B[zero] = fv[zero] * (f1[zero]*A[up] - 2*A[zero] + f2[zero]*A[lo]) + A[zero]
     A = B.copy()
     #timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
-    tt += dz
+    tt += dt
 
 #kontrolle der faktoren !<0.5
 print('factors for each layer !<0.5')
