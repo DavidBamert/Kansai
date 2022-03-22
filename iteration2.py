@@ -104,6 +104,7 @@ for j in range(0, cols):
     #Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
     B[zero] = fv[zero] * (f1[zero]*A[up] - 2*A[zero] + f2[zero]*A[lo]) + A[zero]
     A = B.copy()
+
     #timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
     tt += dt
 
