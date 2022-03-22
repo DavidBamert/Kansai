@@ -41,7 +41,7 @@ A = np.zeros((rows,))
 B = np.zeros((rows,))
 
 #IC
-A[:] = 1
+A[:] = 0
 
 #BCs, [upper, lower] #BC muss in A und B geändert werden. (weil nur in slice 'zero' iteriert wird)
 bcs = [0, 0]
@@ -77,18 +77,29 @@ fv[0],fv[-1] = fv[1],fv[-2]
 f1[0],f1[-1] = f1[1],f1[-2]
 f2[0],f2[-1] = f2[1],f2[-2]
 
-#FOR LOOP
-tt = 0
+#additional loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
+tl = np.array([
+    [0, 1],
+    [5000, 0],
+    ])
 
 #plottimes: 11 evenly spaced points in time !only works with dt=0.5 or dt=1.0
 plottimes = np.arange(0,TIME+dt,TIME/10)
 
+#FOR LOOP, timetracker tt
+tt = 0
 
 for j in range(0, cols):
+    # add load at time t
+    for l, (time, load) in enumerate(tl):
+        if tt == time:
+            A[zero] += load
+
     #plot times of interest
     #plot von A, direkt GGÜ dzsum (dz ändert sich so immer genau richtig)
     if any(tt == plottimes):
         plt.plot(A[:],-dzsum)
+
     #iteration zeitvektoren:CALCULATING NEXT TIME STEP
     #Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
     B[zero] = fv[zero] * (f1[zero]*A[up] - 2*A[zero] + f2[zero]*A[lo]) + A[zero]
