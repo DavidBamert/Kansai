@@ -10,15 +10,14 @@ import matplotlib.pyplot as plt
 
 # discretizazion
 # damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
-dz = 0.5
+dz = 0.2
 dt = 0.5
 
 # fill Layerlist with Layers, from top to bottom
 # lm.layer(hup, hlow, k, me, dz), hup und hlow von oben gemessen(+)
 
 L = [lm.Layer(0, 10, 0.2, 0.3, dz),
-     lm.Layer(10, 20, 1, 0.3, dz),
-     lm.Layer(20, 30, 0.2, 0.3, dz),
+     lm.Layer(10, 20, 0.2, 0.3, dz),
      ]
 
 # throw L into Assembly method
@@ -84,9 +83,12 @@ tl = np.array([
 
 # plottimes: 11 evenly spaced points in time !only works with dt=0.5 or dt=1.0
 plottimes = np.arange(0, TIME + dt, TIME / 10)
+plotmatrix = np.zeros((rows,len(plottimes)))
+lege = np.zeros((len(plottimes),1))
 
 # FOR LOOP, timetracker tt
 tt = 0
+i = 0
 
 for j in range(0, cols):
     # add load at time t
@@ -96,8 +98,10 @@ for j in range(0, cols):
 
     # plot times of interest
     # plot von A, direkt GGÜ dzsum (dz ändert sich so immer genau richtig)
-    if any(tt == plottimes):
-        plt.plot(A[:], -dzsum)
+    if any(plottimes == tt):
+        plotmatrix[:, [i]] = np.reshape(A,(rows,1))
+        lege[[i]] = tt
+        i += 1
 
     # iteration zeitvektoren:CALCULATING NEXT TIME STEP
     # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
@@ -110,4 +114,6 @@ for j in range(0, cols):
 print('factors for each layer !<0.5')
 ass.prnt_factors()
 
+plt.plot(plotmatrix[:], -dzsum, label=lege)
+plt.legend()
 plt.show()

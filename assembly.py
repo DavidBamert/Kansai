@@ -20,7 +20,7 @@ class Assembly:
     def get_dzsum(self):
         array = np.empty((0,), float)
         hlow = 0
-        for L, (layer) in enumerate(self.layerlist):
+        for layer in self.layerlist:
             b = layer.get_dzsummed() + hlow
             array = np.concatenate((array, b))
             hlow = layer.hlow
@@ -29,21 +29,21 @@ class Assembly:
 
     def get_dz(self):
         array = np.empty((0,), float)
-        for L, (layer) in enumerate(self.layerlist):
+        for layer in self.layerlist:
             b = layer.get_dzvect()
             array = np.concatenate((array, b))
         return array
 
     def get_k(self):
         array = np.empty((0,), float)
-        for L, (layer) in enumerate(self.layerlist):
+        for layer in self.layerlist:
             b = layer.get_kvect()
             array = np.concatenate((array, b))
         return array
 
     def get_cv(self):
         array = np.empty((0,), float)
-        for L, (layer) in enumerate(self.layerlist):
+        for layer in self.layerlist:
             b = layer.get_cvvect()
             array = np.concatenate((array, b))
         return array
@@ -61,6 +61,6 @@ class Assembly:
         # methode zum print aller factors der layers
 
     def prnt_factors(self):
-        for L, (layer) in enumerate(self.layerlist):
+        for layer in self.layerlist:
             factor = layer.cv() * self.dt / layer.dzcorr() ** 2
             print(round(factor, 4))
