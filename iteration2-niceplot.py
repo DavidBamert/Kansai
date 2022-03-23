@@ -30,7 +30,7 @@ cv= ass.get_cv()
 dzsum = ass.get_dzsum()
 
 #time discretization
-TIME = 10000
+TIME = 30000
 t = np.arange(0,TIME+dt,dt)
 cols = len(t)
 
@@ -89,7 +89,7 @@ Bb = np.linspace(1,0,cols)
 #additional loads in time tl = np.array([[time,load], ... ]) Liste kann beliebig erweitert werden. [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [5000, 0],
+    [15000, 0],
     ])
 
 for j in range(0, cols):
