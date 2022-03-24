@@ -34,15 +34,15 @@ TIME = 10000
 t = np.arange(0, TIME + dt, dt)
 cols = len(t)
 
-# IC, create B and A
+# create A
 rows = len(dz)
 A = np.zeros((rows,))
-B = np.zeros((rows,))
 
-# IC
+
+# IC (no more needed)
 A[:] = 0
 
-# BCs, [upper, lower] #BC muss in A und B geändert werden. (weil nur in slice 'zero' iteriert wird)
+# BCs, [upper, lower] #BC muss in geändert werden. (weil nur in slice 'zero' iteriert wird)
 bcs = [0, 0]
 
 A[0] = bcs[0]
