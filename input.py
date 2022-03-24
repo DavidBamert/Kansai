@@ -42,4 +42,5 @@ etwa 1000 zeitvektoren speichern, und für plot dann relevante raussuchen
 undrained cond: k[0] k[-1] = 0 setzen 
 
 
+
 """

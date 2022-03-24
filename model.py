@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Mar 13 13:01:07 2022
 damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
 """
 import assembly as am
