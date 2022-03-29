@@ -24,18 +24,14 @@ class Layer:
         return cv
 
         # vector dz erstellen, mit inkrement das ungefÃ¤hr = dz ist. (so dass h genau abgebildet werden kann)
-
+        # ist nÃ¶tig fÃ¼r den plot, deil dz von layer zu layer anders ist.
     def dzcorr(self):
         rows = int((self.hlow - self.hup) / self.dz)
         dzcorr = (self.hlow - self.hup) / rows
         return dzcorr
 
-        # ist nÃ¶tig fÃ¼r den plot, deil dz von layer zu layer anders ist.
-
+        #Vektoren für die Iteration
     def get_dzsummed(self):
-        """
-        Vektoren für die Iteration
-        """
         dzsumvect = np.arange(0, self.hlow - self.hup, self.dzcorr())
         return dzsumvect
 
@@ -55,17 +51,11 @@ class Layer:
         cvvect[:] = cv
         return cvvect
 
-
+        #zur kontrolle
     def prnt_vect(self):
-        """
-        zur kontrolle
-        """
         dzvect = self.get_dzvect()
         kvect = self.get_kvect()
         cvvect = self.get_cvvect()
         print(dzvect)
         print(kvect)
         print(cvvect)
-
-# yolo = layer(1,10,1,1)
-# yolo.prnt_vect()

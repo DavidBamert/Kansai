@@ -47,8 +47,14 @@ class Assembly:
             b = layer.get_cvvect()
             array = np.concatenate((array, b))
         return array
-        # methode zum print aller vektoren, für kontrolle
 
+        # vektoren, factors
+    #def get_fv:
+    #def get_f1:
+    #def get_f2:
+
+
+        # methode zum print aller vektoren, für kontrolle
     def prnt_vect(self):
         dzsum = self.get_dzsum()
         dz = self.get_dz()
@@ -58,8 +64,8 @@ class Assembly:
         print(dz)
         print(k)
         print(cv)
-        # methode zum print aller factors der layers
 
+        # methode zum print aller factors der layers
     def prnt_factors(self):
         for layer in self.layerlist:
             factor = layer.cv() * self.dt / layer.dzcorr() ** 2
