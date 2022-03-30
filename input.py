@@ -17,10 +17,11 @@ dt = 0.5
 TIME = 10000
 
 #layers
-L = [lm.Layer(0, 10, 0.2, 0.3, dz),
-     lm.Layer(10, 15, 0.2, 0.3, dz),
-     lm.Layer(15, 30, 0.8, 0.3, dz)
+L = [lm.Layer(0, 2, 0.2, 0.3, dz),
+     lm.Layer(2, 4, 0.2, 0.3, dz)
      ]
+
+L[-1].hlow += L[-1].dz
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
 bcs = [0, 0]
@@ -44,7 +45,5 @@ viel von modelmethod in assemblymetohd verschieben (Faktorvektoren, Plotcodes,..
 etwa n*1000 zeitvektoren speichern, und für plot dann relevante raussuchen 
 
 undrained cond: k[0] k[-1] = 0 setzen 
-
-
 
 """
