@@ -21,6 +21,7 @@ L = [lm.Layer(0, 2, 0.2, 0.3, dz),
      lm.Layer(2, 4, 0.2, 0.3, dz)
      ]
 
+#add 1 dz to the last layers vector
 L[-1].hlow += L[-1].dz
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
