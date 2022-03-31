@@ -26,7 +26,13 @@ class Model:
         k = ss.get_k()
         cv = ss.get_cv()
         dzsum = ss.get_dzsum()
-        
+
+        #this enables undrained condition:
+        if self.bcs[0] == 1:
+            k[1] = 0.00000001
+        elif self.bcs[1] == 1:
+            k[-1] = 0.00000001
+
         # time discretization
         t = np.arange(0, self.TIME + self.dt, self.dt)
         cols = len(t)
@@ -74,7 +80,7 @@ class Model:
         # FOR LOOP, timetracker tt
         tt = 0
         i = 0
-        
+
         for j in range(0, cols):
             # add load at time t
             for l, (time, load) in enumerate(self.tl):
