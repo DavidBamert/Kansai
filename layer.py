@@ -1,11 +1,14 @@
-import numpy as np
 
-yw = 10
-
-
+"""
+in: Layer
+out: vectors with layerproperties
+"""
 # hup und hlow sind gemessen von oben (positiv)
 # k: Durchlässigkeit kgross->sehr durchlÃ¤ssig
 
+import numpy as np
+
+yw = 10
 
 class Layer:
     def __init__(self, hup, hlow, k, me, dz):
