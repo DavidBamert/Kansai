@@ -31,7 +31,7 @@ class Model:
         #get factors and slices <-bcs
         factors_slices = ss.get_factors_slices(self.bcs)
         fv, f1, f2, up, zero, lo = factors_slices[:]
-        # time discretization
+        #get time discretization and plot
         cols = tt.get_cols()
         plottimes, plotmatrix, timelegend = tt.get_plotmatrix(rows)
 
