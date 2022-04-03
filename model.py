@@ -19,8 +19,7 @@ class Model:
         self.bcs = bcs
         self.tl = tl
 
-    def solve(self):
-            
+    def get_data(self):
         # use Assembly method and timee method
         ss = am.Assembly(self.L, self.dt)
         tt = tm.Time(self.T, self.dt)
@@ -40,6 +39,12 @@ class Model:
         tt = 0
         #i = column number of plotmatrix
         i = 0
+
+        return rows, A, fv, f1, f2, up, zero, lo, cols, plottimes, plotmatrix, timelegend, tt, i
+
+    def solve(self):
+            
+        rows, A, fv, f1, f2, up, zero, lo, cols, plottimes, plotmatrix, timelegend, tt, i = self.get_data()
 
         # FOR LOOP,
         for j in range(0, cols):
