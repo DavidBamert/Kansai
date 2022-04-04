@@ -16,11 +16,11 @@ dz = 0.5
 dt = 0.5
 
 #Timeperiod
-T = 60000
+T = 10000
 
 #layers
-L = [lm.Layer(0, 20, 0.2, 0.3, dz),
-     lm.Layer(20, 40, 0.2, 0.3, dz)
+L = [lm.Layer(0, 10, 0.2, 0.3, dz),
+     lm.Layer(10, 20, 0.2, 0.3, dz)
      ]
 
 #add 1 dz to the last layers vector
@@ -36,13 +36,13 @@ tl = np.array([
 ])
 
 #number of graphs
-amount = 11
+graphs = 101
 
 #create assembly and timee object
 ss = am.Assembly(L, dt)
 tt = tm.Time(T, dt)
 
-model = mm.Model(bcs, tl, ss, tt, amount)
+model = mm.Model(bcs, tl, ss, tt, graphs)
 model.get_plot()
 
 """

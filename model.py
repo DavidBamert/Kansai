@@ -11,50 +11,56 @@ wie kann ich am.Assembly nur 1 mal aufrufen, und nicht in jeder methode nochmal?
 
 
 class Model:
-    def __init__(self, bcs, tl, ss, tt, amount):
+    def __init__(self, bcs, tl, ss, tt, graphs):
         self.bcs = bcs  #1mal
         self.tl = tl    #ja
         self.ss = ss    #ja
         self.tt = tt    #ja
-        self.amount = amount
+        self.graphs = graphs
 
-    def get_fixeddata(self):
+    def get_fixeddata(self):    #this prepares the fix data for the iteration
 
         #create A
         rows = len(self.ss.get_dz())
         A = np.zeros((rows,))
 
         #get factors and slices <-bcs
-        factors_slices = self.ss.get_factors_slices(self.bcs)
-        fv, f1, f2, up, zero, lo = factors_slices[:]
+        up, zero, lo = self.ss.get_slices()
+
         #get time discretization and plot
         cols = self.tt.get_cols()
-        plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.amount)
+        plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.graphs)
 
         #ttrack = timetracker
         ttrack = 0
         #i = column number of plotmatrix
         i = 0
 
-        return rows, A, fv, f1, f2, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
+        return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
 
-    def get_variabledata(self):
-        blubb = 1
-        return blubb
+    def get_variabledata(self): #this prepares (and in the future alters) the variable data for the iteration
+
+        fv, f1, f2 = self.ss.get_factors(self.bcs)
+        return fv, f1, f2
 
     def solve(self):
-            
-        rows, A, fv, f1, f2, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
+
+        #get the fixed data
+        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
 
         # FOR LOOP,
         for j in range(0, cols):
-            # add load at time t
+
+            #get the variable data
+            fv, f1, f2 = self.get_variabledata()
+
+            #add load at time t
             for l, (time, load) in enumerate(self.tl):
                 if ttrack == time:
                     A[zero] += load
 
-            # relevante Zeiten in matrix speichern
-            #damit alle dt funktionieren: add 'if i<len(timelegend)''
+            #save relevant vectors in plot matrix
+                #damit alle dt funktionieren: add 'if i<len(timelegend)''
             if ttrack >= plottimes[i]:
                 plotmatrix[:, [i]] = np.reshape(A,(rows,1))
                 timelegend[[i]] = ttrack

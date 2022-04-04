@@ -49,7 +49,17 @@ class Assembly:
         return array
 
 # faktor vektoren und slices, für iteration
-    def get_factors_slices(self, bcs):
+
+    def get_slices(self):
+        # up = i-1; zero = i; lo = i+1
+        rows = len(self.get_dz())
+
+        up = slice(0, rows - 2)
+        zero = slice(1, rows - 1)
+        lo = slice(2, rows)
+        return up, zero, lo
+
+    def get_factors(self, bcs):
         #needed vectors
         dz = self.get_dz()
         k = self.get_k()
@@ -64,9 +74,7 @@ class Assembly:
         #length of vectors
         rows = len(self.get_dz())
         #up = i-1; zero = i; lo = i+1
-        up = slice(0, rows - 2)
-        zero = slice(1, rows - 1)
-        lo = slice(2, rows)
+        up, zero, lo = self.get_slices()
         #initialize
         fv = np.zeros((rows,))
         f1 = np.zeros((rows,))
@@ -80,7 +88,7 @@ class Assembly:
         f1[0], f1[-1] = f1[1], f1[-2]
         f2[0], f2[-1] = f2[1], f2[-2]
 
-        return fv, f1, f2, up, zero, lo
+        return fv, f1, f2
 
         # methode zum print aller factors der layers (!<0.5)
     def prnt_factors(self):
