@@ -4,22 +4,23 @@ INPUT
 damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
 """
 
+import timee as tm
 import assembly as am
 import layer as lm
 import model as mm
 import numpy as np
 
 
-#discretizazion (dont use dt=0.3, numerical noise reasons)
+#discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 0.5
 dt = 0.5
 
 #Timeperiod
-T = 60000
+T = 500
 
 #layers
-L = [lm.Layer(0, 20, 0.2, 0.3, dz),
-     lm.Layer(20, 40, 0.2, 0.3, dz)
+L = [lm.Layer(0, 2, 0.2, 0.3, dz),
+     lm.Layer(2, 4, 0.2, 0.3, dz)
      ]
 
 #add 1 dz to the last layers vector
@@ -34,9 +35,12 @@ tl = np.array([
     [40000, 0]
 ])
 
-model = mm.Model(dz, dt, T, L, bcs, tl)
-model.get_plot()
+#create assembly and timee object
+ss = am.Assembly(L, dt)
+tt = tm.Time(T, dt)
 
+model = mm.Model(bcs, tl, ss, tt)
+model.get_plot()
 
 """
 TODO:
