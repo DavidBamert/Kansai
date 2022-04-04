@@ -11,11 +11,12 @@ wie kann ich am.Assembly nur 1 mal aufrufen, und nicht in jeder methode nochmal?
 
 
 class Model:
-    def __init__(self, bcs, tl, ss, tt):
+    def __init__(self, bcs, tl, ss, tt, amount):
         self.bcs = bcs  #1mal
         self.tl = tl    #ja
         self.ss = ss    #ja
         self.tt = tt    #ja
+        self.amount = amount
 
     def get_fixeddata(self):
 
@@ -28,7 +29,7 @@ class Model:
         fv, f1, f2, up, zero, lo = factors_slices[:]
         #get time discretization and plot
         cols = self.tt.get_cols()
-        plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows)
+        plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.amount)
 
         #ttrack = timetracker
         ttrack = 0
