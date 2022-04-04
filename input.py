@@ -16,13 +16,12 @@ dz = 0.5
 dt = 0.5
 
 #Timeperiod
-T = 10000
+T = 20000
 
 #layers
 L = [lm.Layer(0, 10, 0.2, 0.3, dz),
      lm.Layer(10, 20, 0.2, 0.3, dz)
      ]
-
 #add 1 dz to the last layers vector
 L[-1].hlow += L[-1].dz
 
@@ -32,11 +31,11 @@ bcs = [0, 0]
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [40000, 0]
+    [10000, 0]
 ])
 
 #number of graphs
-graphs = 101
+graphs = 11
 
 #create assembly and timee object
 ss = am.Assembly(L, dt)

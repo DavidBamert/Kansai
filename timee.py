@@ -1,11 +1,8 @@
 """
 this class solves the time discretization and the plot matrix
 """
-
-
 import numpy as np
 import layer as lm
-
 
 class Time:
     def __init__(self, T, dt):

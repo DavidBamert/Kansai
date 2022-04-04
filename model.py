@@ -5,11 +5,6 @@ import layer as lm
 import numpy as np
 import matplotlib.pyplot as plt
 
-"""
-wie kann ich am.Assembly nur 1 mal aufrufen, und nicht in jeder methode nochmal?
-"""
-
-
 class Model:
     def __init__(self, bcs, tl, ss, tt, graphs):
         self.bcs = bcs  #1mal
@@ -87,6 +82,6 @@ class Model:
         # plot erstellen
         #dzsum helps plotting without distortion
         dzsum = self.ss.get_dzsum()
-        plt.plot(plotmatrix[:], -dzsum, label = timelegend)
+        plt.plot(plotmatrix[:], -dzsum, label=timelegend)
         plt.legend()
         plt.show()
