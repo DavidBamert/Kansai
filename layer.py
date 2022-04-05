@@ -17,7 +17,7 @@ class Layer:
         self.k = k
         self.me = me
         self.dz = dz
-
+#faktoren
     def height(self):
         height = self.hlow - self.hup
         return height
@@ -28,12 +28,15 @@ class Layer:
 
         # vector dz erstellen, mit inkrement das ungefÃ¤hr = dz ist. (so dass h genau abgebildet werden kann)
         # ist nÃ¶tig fÃ¼r den plot, deil dz von layer zu layer anders ist.
+
+#vektoren
     def dzcorr(self):
         rows = int((self.hlow - self.hup) / self.dz)
         dzcorr = (self.hlow - self.hup) / rows
         return dzcorr
 
         #Vektoren für die Iteration
+
     def get_dzsummed(self):
         dzsumvect = np.arange(0, self.hlow - self.hup, self.dzcorr())
         return dzsumvect
@@ -55,6 +58,8 @@ class Layer:
         return cvvect
 
         #zur kontrolle
+
+#zur kontrolle
     def prnt_vect(self):
         dzvect = self.get_dzvect()
         kvect = self.get_kvect()

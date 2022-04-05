@@ -13,14 +13,15 @@ import numpy as np
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 0.5
-dt = 0.5
+dt = 2
 
 #Timeperiod
 T = 20000
 
 #layers
 L = [lm.Layer(0, 10, 0.2, 0.3, dz),
-     lm.Layer(10, 20, 0.2, 0.3, dz)
+     lm.Layer(10, 20, 0.2, 0.3, dz),
+     lm.Layer(20, 30, 0.2, 0.3, dz)
      ]
 #add 1 dz to the last layers vector
 L[-1].hlow += L[-1].dz
@@ -35,7 +36,7 @@ tl = np.array([
 ])
 
 #number of graphs
-graphs = 11
+graphs = 51
 
 #create assembly and timee object
 ss = am.Assembly(L, dt)
