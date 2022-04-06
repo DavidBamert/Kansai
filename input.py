@@ -42,6 +42,7 @@ graphs = 11
 ss = am.Assembly(L, dt)
 tt = tm.Time(T, dt)
 
+#solve the model using FDM
 model = mm.Model(bcs, tl, ss, tt, graphs)
 model.get_plot()
 
