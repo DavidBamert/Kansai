@@ -1,4 +1,3 @@
-
 """
 in: Layer
 out: vectors with layerproperties
@@ -10,6 +9,7 @@ import numpy as np
 
 yw = 10
 
+
 class Layer:
     def __init__(self, hup, hlow, k, me, dz):
         self.hup = hup
@@ -17,6 +17,7 @@ class Layer:
         self.k = k
         self.me = me
         self.dz = dz
+
 #faktoren
     def height(self):
         height = self.hlow - self.hup
@@ -56,8 +57,6 @@ class Layer:
         cvvect = self.get_dzsummed()
         cvvect[:] = cv
         return cvvect
-
-        #zur kontrolle
 
 #zur kontrolle
     def prnt_vect(self):
