@@ -34,7 +34,7 @@ class Model:
         return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
 
     def get_variabledata(self): #this prepares (and in the future alters) the variable data for the iteration
-
+        #change fi and dz
         fv, f1, f2 = self.ss.get_factors()
         return fv, f1, f2
 
