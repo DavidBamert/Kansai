@@ -16,11 +16,11 @@ dz = 0.5
 dt = 0.5
 
 #Timeperiod
-T = 10000
+T = 100
 
 #layers
-L = [lm.Layer(0, 10, 0.2, 0.3, dz),
-     lm.Layer(10, 20, 0.2, 0.3, dz)
+L = [lm.Layer(0, 1, 0.2, 0.3, dz),
+     lm.Layer(1, 2, 0.2, 0.3, dz)
      ]
 
 #add 1 dz to the last layers vector
@@ -53,5 +53,9 @@ Aufräumen
 
 Plot verbessern:
     interpolieren (?)
+    
+Layerlist: 
+    den letzten vektor mit dz verlängern ist nicht schön aber funktioniert. 
+    
 
 """
