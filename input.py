@@ -16,7 +16,7 @@ dz = 0.5
 dt = 0.5
 
 #Timeperiod
-T = 100
+T = 1000
 
 #layers
 L = [lm.Layer(0, 1, 0.2, 0.3, dz),
@@ -27,12 +27,12 @@ L = [lm.Layer(0, 1, 0.2, 0.3, dz),
 L[-1].hlow += L[-1].dz
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
-bcs = [0, 0]
+bcs = [0, 1]
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [5000, 0]
+    [500, 0]
 ])
 
 #number of graphs

@@ -144,7 +144,7 @@ class Model:
     def get_plot(self):
 
         assert self.bcs == [0, 0] or self.bcs == [0, 1] or self.bcs == [1, 0], 'check bcs'
-
+        #solve while using the correct boundary conditions
         if self.bcs == [0, 0]:
             plotmatrix, timelegend = self.solve00()
         elif self.bcs == [0, 1]:
