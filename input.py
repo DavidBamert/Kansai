@@ -13,14 +13,14 @@ import numpy as np
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 0.5
-dt = 0.5
+dt = 1
 
 #Timeperiod
-T = 1000
+T = 60000
 
 #layers
-L = [lm.Layer(0, 1, 0.2, 0.3, dz),
-     lm.Layer(1, 2, 0.2, 0.3, dz)
+L = [lm.Layer(0, 10, 0.2, 0.3, dz),
+     lm.Layer(10, 20, 0.2, 0.3, dz)
      ]
 
 #add 1 dz to the last layers vector
