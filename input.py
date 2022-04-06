@@ -13,30 +13,29 @@ import numpy as np
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 0.5
-dt = 2
+dt = 0.5
 
 #Timeperiod
-T = 20000
+T = 100
 
 #layers
-L = [lm.Layer(0, 10, 0.2, 0.3, dz),
-     lm.Layer(10, 20, 0.2, 0.3, dz),
-     lm.Layer(20, 30, 0.2, 0.3, dz)
+L = [lm.Layer(0, 1, 0.2, 0.3, dz),
+     lm.Layer(1, 2, 0.2, 0.3, dz)
      ]
 #add 1 dz to the last layers vector
 L[-1].hlow += L[-1].dz
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
-bcs = [0, 0]
+bcs = [0, 1]
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [10000, 0]
+    [50, 0]
 ])
 
 #number of graphs
-graphs = 51
+graphs = 11
 
 #create assembly and timee object
 ss = am.Assembly(L, dt)

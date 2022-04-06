@@ -55,17 +55,11 @@ class Assembly:
         lo = slice(2, rows)
         return up, zero, lo
 
-    def get_factors(self, bcs):
+    def get_factors(self):
         #needed vectors
         dz = self.get_dz()
         k = self.get_k()
         cv = self.get_cv()
-
-        #apply undrained boundary condition
-        if bcs[0] == 1:
-            k[0] = 0.00000001
-        elif bcs[1] == 1:
-            k[-2] = 0.00000001
 
         #length of vectors
         rows = len(self.get_dz())
