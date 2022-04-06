@@ -98,7 +98,7 @@ class Model:
             # iteration zeitvektoren:CALCULATING NEXT TIME STEP
             # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
             A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
-            A[-1] =   fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
+            A[-1] = fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
 
             # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
             ttrack += self.tt.dt
