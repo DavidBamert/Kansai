@@ -80,11 +80,13 @@ class Assembly:
 
         return fv, f1, f2
 
-# methode zum print aller factors der layers (!<0.5)
-    def prnt_factors(self):
+    # methode zum print aller factors der layers (!<0.5)
+    def get_mfact(self):
+        mfact = []
         for layer in self.layerlist:
             factor = layer.cv() * self.dt / layer.dzcorr() ** 2
-            print(round(factor, 4))
+            mfact.append(factor)
+        return np.array(mfact)
 
 # methode zum print aller vektoren, für kontrolle
     def prnt_vect(self):

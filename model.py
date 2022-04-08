@@ -143,6 +143,13 @@ class Model:
 
     def get_plot(self):
 
+        # check mfactors !<0.5
+        print('factors for each layer !<0.5')
+        mfact = self.ss.get_mfact()
+        print(mfact)
+        #assert all(mfact < 0.5), 'check mfact, mathematically unstable'
+
+        # check boundry conditions
         assert self.bcs == [0, 0] or self.bcs == [0, 1] or self.bcs == [1, 0], 'check bcs'
         #solve while using the correct boundary conditions
         if self.bcs == [0, 0]:
@@ -152,9 +159,6 @@ class Model:
         elif self.bcs == [1, 0]:
             plotmatrix, timelegend = self.solve10()
 
-        # kontrolle der faktoren !<0.5
-        print('factors for each layer !<0.5')
-        self.ss.prnt_factors()
 
         # plot erstellen
         #dzsum helps plotting without distortion
