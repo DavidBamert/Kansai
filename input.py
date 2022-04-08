@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
+""""
 INPUT
 damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
 """
@@ -16,7 +15,7 @@ dz = 0.5
 dt = 1
 
 #Timeperiod
-T = 60000
+T = 10000
 
 #layers
 L = [lm.Layer(0, 10, 0.2, 0.3, dz),
@@ -27,12 +26,12 @@ L = [lm.Layer(0, 10, 0.2, 0.3, dz),
 L[-1].hlow += L[-1].dz
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
-bcs = [0, 1]
+bcs = [0, 0]
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [500, 0]
+    [5000, 0]
 ])
 
 #number of graphs
@@ -53,9 +52,6 @@ Aufräumen
 
 Plot verbessern:
     interpolieren (?)
-    
-Layerlist: 
-    den letzten vektor mit dz verlängern ist nicht schön aber funktioniert. 
     
 
 """
