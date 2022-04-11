@@ -31,7 +31,7 @@ bcs = [0, 0]
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [5000, 0]
+    [1000, 0]
 ])
 
 #number of graphs
