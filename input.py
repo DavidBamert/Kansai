@@ -15,11 +15,11 @@ dz = 0.5
 dt = 0.5
 
 #Timeperiod
-T = 100
+T = 10000
 
 #layers
-L = [lm.Layer(0, 10, 8.3, 0.3, dz),
-     lm.Layer(10, 20, 0.2, 0.3, dz)
+L = [lm.Layer(0, 3, 0.1, 0.3, dz),
+     lm.Layer(3, 20, 0.3, 0.3, dz)
      ]
 
 #add 1 dz to the last layers vector
@@ -45,13 +45,17 @@ tt = tm.Time(T, dt)
 model = mm.Model(bcs, tl, ss, tt, graphs)
 model.get_plot()
 
+
+assert all(tl[0] % dt == 0), 'tl[0] funktioniert nur, wenn von dt ohne rest geteilt'
+
+
 """
 TODO:
 
 Aufräumen
 
 Plot verbessern:
-    interpolieren (?)
+    interpolieren
+    A.reshape macht iteration evtl. langsamer
     
-
 """

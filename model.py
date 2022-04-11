@@ -62,7 +62,7 @@ class Model:
                 timelegend[[i]] = ttrack
                 i += 1
 
-            # iteration zeitvektoren:CALCULATING NEXT TIME STEP
+            # iteration zeitvektoren: CALCULATING NEXT TIME STEP
             # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
             A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
 
@@ -91,7 +91,7 @@ class Model:
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
             if ttrack >= plottimes[i]:
-                plotmatrix[:, [i]] = np.reshape(A,(rows,1))
+                plotmatrix[:, [i]] = np.reshape(A,(rows,1))         #reshape entfernen?
                 timelegend[[i]] = ttrack
                 i += 1
 
@@ -164,5 +164,7 @@ class Model:
         #dzsum helps plotting without distortion
         dzsum = self.ss.get_dzsum()
         plt.plot(plotmatrix[:], -dzsum, label=timelegend)
-        plt.legend()
+        plt.xlabel("Pore water pressure")
+        plt.ylabel("depth")
+        plt.legend(loc=4, prop={'size': 6})
         plt.show()
