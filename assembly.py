@@ -8,9 +8,22 @@ import layer as lm
 
 
 class Assembly:
-    def __init__(self, layerlist, dt):
+    def __init__(self, layerlist, dt, drainage):
         self.layerlist = layerlist
         self.dt = dt
+        self.drainage = drainage
+
+    def get_drainvect(self):
+        drainvect = []
+        for i in self.drainage:
+            Lnew = self.layerlist[0:i]
+            ssnew = Assembly(Lnew, self.dt, [])
+            rownew = len(ssnew.get_dz())
+            drainvect.append(rownew)
+
+        return np.array(drainvect)
+
+
 
 # dzsum hilft, die kurven unverzerrt zu plotten
     def get_dzsum(self):

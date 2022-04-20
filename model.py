@@ -43,7 +43,7 @@ class Model:
 
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
-
+        drainvect = self.ss.get_drainvect()
         # FOR LOOP,
         for j in range(0, cols):
 
@@ -54,7 +54,10 @@ class Model:
             for l, (time, load) in enumerate(self.tl):
                 if ttrack == time:
                     A[zero] += load
-                #A[20] = 0 für drainage innerhalb der schichten A[] = 0 hier einfügen
+
+            #internal drainage
+            for j in drainvect:
+                A[j] = 0 #für drainage innerhalb der schichten A[] = 0 hier einfügen
 
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
@@ -77,6 +80,7 @@ class Model:
 
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
+        drainvect = self.ss.get_drainvect()
 
         # FOR LOOP,
         for j in range(0, cols):
@@ -89,6 +93,11 @@ class Model:
                 if ttrack == time:
                     A[zero] += load
                     A[-1] += load
+
+            #internal drainage
+            for j in drainvect:
+                A[j] = 0 #für drainage innerhalb der schichten A[] = 0 hier einfügen
+
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
             if ttrack >= plottimes[i]:
@@ -111,6 +120,7 @@ class Model:
 
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
+        drainvect = self.ss.get_drainvect()
 
         # FOR LOOP,
         for j in range(0, cols):
@@ -123,6 +133,11 @@ class Model:
                 if ttrack == time:
                     A[zero] += load
                     A[0] += load
+
+            #internal drainage
+            for j in drainvect:
+                A[j] = 0 #für drainage innerhalb der schichten A[] = 0 hier einfügen
+
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
             if ttrack >= plottimes[i]:
@@ -141,6 +156,48 @@ class Model:
             ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
 
         return plotmatrix, timelegend
+#solves undrained-undrained
+    def solve11(self):
+
+        # get the fixed data
+        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
+        drainvect = self.ss.get_drainvect()
+
+        # FOR LOOP,
+        for j in range(0, cols):
+
+            # get the variable data
+            fv, f1, f2 = self.get_variabledata()
+
+            # add load at time t
+            for l, (time, load) in enumerate(self.tl):
+                if ttrack == time:
+                    A[zero] += load
+                    A[0] += load
+                    A[-1] += load
+            # internal drainage
+            for j in drainvect:
+                A[j] = 0  # für drainage innerhalb der schichten A[] = 0 hier einfügen
+
+            # save relevant vectors in plot matrix
+            # damit alle dt funktionieren: add 'if i<len(timelegend)''
+            if ttrack >= plottimes[i]:
+                plotmatrix[:, [i]] = np.reshape(A, (rows, 1))
+                timelegend[[i]] = ttrack
+                i += 1
+
+            # iteration zeitvektoren:CALCULATING NEXT TIME STEP
+            # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
+            A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
+
+            A[0] = fv[0] * (f1[0] * A[1] - 2 * A[0] + f2[0] * A[1]) + A[0]
+            A[-1] = fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
+
+            # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
+            ttrack += self.tt.dt
+            ttrack = round(ttrack, 3)  # dies macht dt robuster (eliminates numerical noise which causes problems)
+
+        return plotmatrix, timelegend
 
     def get_plot(self):
 
@@ -150,8 +207,6 @@ class Model:
         print(mfact)
         #assert all(mfact < 0.5), 'check mfact, mathematically unstable'
 
-        # check boundry conditions
-        assert self.bcs == [0, 0] or self.bcs == [0, 1] or self.bcs == [1, 0], 'check bcs'
         #solve while using the correct boundary conditions
         if self.bcs == [0, 0]:
             plotmatrix, timelegend = self.solve00()
@@ -159,7 +214,8 @@ class Model:
             plotmatrix, timelegend = self.solve01()
         elif self.bcs == [1, 0]:
             plotmatrix, timelegend = self.solve10()
-
+        elif self.bcs == [1, 1]:
+            plotmatrix, timelegend = self.solve11()
 
         # plot erstellen
         #dzsum helps plotting without distortion

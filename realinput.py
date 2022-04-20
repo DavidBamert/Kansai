@@ -25,8 +25,13 @@ L = [lm.Layer(0, 20, 1e-9, 1670, dz),
 #add 1 dz to the last layers vector
 L[-1].hlow += L[-1].dz
 
+#drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1)
+drainage = []
+assert all(np.array(drainage) < len(L)), 'more drainages than Layers-1'
+
 #boundry conditions [upper, lower] 0 drained, 1 undrained
 bcs = [0, 0]
+assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check bcs'
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
@@ -38,7 +43,7 @@ tl = np.array([
 graphs = 11
 
 #create assembly and timee object
-ss = am.Assembly(L, dt)
+ss = am.Assembly(L, dt, drainage)
 tt = tm.Time(T, dt)
 
 model = mm.Model(bcs, tl, ss, tt, graphs)
