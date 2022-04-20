@@ -29,7 +29,7 @@ L[-1].hlow += L[-1].dz
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1)
 drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
-assert all(np.array(drainage) < len(L)), 'more drainages than Layers-1'
+assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
 bcs = [0, 0]
