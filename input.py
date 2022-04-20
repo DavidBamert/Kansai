@@ -26,7 +26,7 @@ L = [lm.Layer(0, 2, 0.3, 0.3, dz),
 #add 1 dz to the last layers vector
 L[-1].hlow += L[-1].dz
 
-#drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1)
+#drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
 drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
