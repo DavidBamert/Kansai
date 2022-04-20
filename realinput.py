@@ -27,6 +27,7 @@ L[-1].hlow += L[-1].dz
 
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1)
 drainage = []
+dp = 0 #could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)), 'more drainages than Layers-1'
 
 #boundry conditions [upper, lower] 0 drained, 1 undrained
@@ -46,5 +47,5 @@ graphs = 11
 ss = am.Assembly(L, dt, drainage)
 tt = tm.Time(T, dt)
 
-model = mm.Model(bcs, tl, ss, tt, graphs)
+model = mm.Model(bcs, tl, ss, tt, graphs, dp)
 model.get_plot()

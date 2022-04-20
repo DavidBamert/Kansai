@@ -6,13 +6,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Model:
-    def __init__(self, bcs, tl, ss, tt, graphs):
+    def __init__(self, bcs, tl, ss, tt, graphs, dp):
         self.bcs = bcs  #1mal
         self.tl = tl    #ja
         self.ss = ss    #ja
         self.tt = tt    #ja
         self.graphs = graphs
-
+        self.dp = dp
     def get_fixeddata(self):    #this prepares the fix data for the iteration
 
         #create A
@@ -57,7 +57,7 @@ class Model:
 
             #internal drainage
             for j in drainvect:
-                A[j] = 0 #für drainage innerhalb der schichten A[] = 0 hier einfügen
+                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
 
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
@@ -96,7 +96,7 @@ class Model:
 
             #internal drainage
             for j in drainvect:
-                A[j] = 0 #für drainage innerhalb der schichten A[] = 0 hier einfügen
+                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
 
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
@@ -136,7 +136,7 @@ class Model:
 
             #internal drainage
             for j in drainvect:
-                A[j] = 0 #für drainage innerhalb der schichten A[] = 0 hier einfügen
+                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
 
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''
@@ -177,7 +177,7 @@ class Model:
                     A[-1] += load
             # internal drainage
             for j in drainvect:
-                A[j] = 0  # für drainage innerhalb der schichten A[] = 0 hier einfügen
+                A[j] = self.dp  # für drainage innerhalb der schichten A[] = 0 hier einfügen
 
             # save relevant vectors in plot matrix
             # damit alle dt funktionieren: add 'if i<len(timelegend)''
