@@ -54,6 +54,7 @@ class Model:
             for l, (time, load) in enumerate(self.tl):
                 if ttrack == time:
                     A[zero] += load
+                #A[20] = 0 für drainage innerhalb der schichten A[] = 0 hier einfügen
 
             #save relevant vectors in plot matrix
                 #damit alle dt funktionieren: add 'if i<len(timelegend)''

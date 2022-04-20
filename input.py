@@ -11,15 +11,14 @@ import numpy as np
 
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.5
-dt = 0.5
+dz = 0.05
+dt = 0.05
 
 #Timeperiod
-T = 10000
+T = 100
 
 #layers
-L = [lm.Layer(0, 3, 0.1, 0.3, dz),
-     lm.Layer(3, 20, 0.3, 0.3, dz)
+L = [lm.Layer(0, 2, 0.3, 0.3, dz)
      ]
 
 #add 1 dz to the last layers vector
@@ -46,7 +45,7 @@ model = mm.Model(bcs, tl, ss, tt, graphs)
 model.get_plot()
 
 
-assert all(tl[0] % dt == 0), 'tl[0] funktioniert nur, wenn von dt ohne rest geteilt'
+#assert all(tl[0] % dt == 0), 'tl[0] funktioniert nur, wenn von dt ohne rest geteilt'
 
 
 """
@@ -58,4 +57,7 @@ Plot verbessern:
     interpolieren
     A.reshape macht iteration evtl. langsamer
     
+Drainage innerhalb der schichten: 
+    model line 57 lösungsbeispiel
+    A[h] = 0 
 """
