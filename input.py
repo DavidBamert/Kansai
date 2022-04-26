@@ -18,6 +18,7 @@ dt = 0.05
 T = 400
 
 #layers
+#welche Werte in welcher Reihenfolge eingeben? --> hup, hlow, k, me, dz
 L = [lm.Layer(0, 2, 0.3, 0.3, dz),
      lm.Layer(2, 4, 0.3, 0.3, dz),
      lm.Layer(4, 6, 0.3, 0.3, dz)
