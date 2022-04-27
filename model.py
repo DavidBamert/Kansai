@@ -1,7 +1,4 @@
 
-import timee as tm
-import assembly as am
-import layer as lm
 import numpy as np
 import matplotlib.pyplot as plt
 

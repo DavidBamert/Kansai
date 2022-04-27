@@ -4,7 +4,6 @@ in: layervectors 0-n
 out: stacked/assembled vectors, ready for model iteration
 """
 import numpy as np
-import layer as lm
 
 
 class Assembly:
