@@ -18,10 +18,10 @@ dt = 0.05
 T = 400
 
 #layers
-#welche Werte in welcher Reihenfolge eingeben? --> hup, hlow, k, me, dz
-L = [lm.Layer(0, 2, 0.3, 0.3, dz),
-     lm.Layer(2, 4, 0.3, 0.3, dz),
-     lm.Layer(4, 6, 0.3, 0.3, dz)
+#welche Werte in welcher Reihenfolge eingeben? --> hup, hlow, k, me_init, dz, c_c, e_0, me_case="constant"
+L = [lm.Layer(0, 2, 0.3, 0.3, dz, 0.4, 0.002, "constant"),
+     lm.Layer(2, 4, 0.3, 0.3, dz, 0.4, 0.002, "PD"),
+     lm.Layer(4, 6, 0.3, 0.3, dz, 0.4, 0.002, "PD")
      ]
 
 #add 1 dz to the last layers vector
