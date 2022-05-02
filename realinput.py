@@ -17,9 +17,8 @@ dt = 1e4
 T = 5e9
 
 #layers
-L = [lm.Layer(0, 20, 1e-9, 1670, dz),
-     lm.Layer(20, 40, 1e-9, 1670, dz),
-     lm.Layer(40, 60, 1e-9, 1670, dz)
+L = [lm.Layer(0, 20, 1e-9, 1670, dz, 11, 0.4, 1.0),
+     lm.Layer(20, 40, 1e-9, 1670, dz, 11, 0.4, 1.0)
      ]
 
 #add 1 dz to the last layers vector
@@ -49,3 +48,4 @@ tt = tm.Time(T, dt)
 
 model = mm.Model(bcs, tl, ss, tt, graphs, dp)
 model.get_plot()
+

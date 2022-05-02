@@ -11,12 +11,15 @@ yw = 10
 
 
 class Layer:
-    def __init__(self, hup, hlow, k, me, dz):
+    def __init__(self, hup, hlow, k, me, dz, gamma, Cc, e0):
         self.hup = hup
         self.hlow = hlow
         self.k = k
         self.me = me
         self.dz = dz
+        self.gamma = gamma
+        self.Cc = Cc
+        self.e0 = e0
 
 #faktoren
     def height(self):
@@ -57,6 +60,21 @@ class Layer:
         cvvect = self.get_dzsummed()
         cvvect[:] = cv
         return cvvect
+
+#variable expansion
+    def get_effsigma(self):
+        effsigma = self.gamma * self.get_dzsummed()
+        return effsigma
+
+    def get_Cc(self):
+        Ccvect = self.get_dzsummed()
+        Ccvect[:] = self.Cc
+        return Ccvect
+
+    def get_e0(self):
+        e0vect = self.get_dzsummed()
+        e0vect[:] = self.e0
+        return e0vect
 
 #zur kontrolle
     def prnt_vect(self):

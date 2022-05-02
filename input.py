@@ -11,16 +11,15 @@ import numpy as np
 
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.05
-dt = 0.05
+dz = 0.5
+dt = 100000
 
 #Timeperiod
-T = 400
+T = 8e8
 
-#layers
-L = [lm.Layer(0, 2, 0.3, 0.3, dz),
-     lm.Layer(2, 4, 0.3, 0.3, dz),
-     lm.Layer(4, 6, 0.3, 0.3, dz)
+#layers(self, hup, hlow, k, me, dz, gamma, Cc, e0)
+L = [lm.Layer(0, 10, 1e-9, 1700, dz, 11, 0.4, 0.9),
+     lm.Layer(10, 30, 1e-9, 1700, dz, 12, 0.4, 0.9)
      ]
 
 #add 1 dz to the last layers vector
@@ -38,7 +37,7 @@ assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [200, 0]
+    [4e8, 0]
 ])
 
 #number of graphs
@@ -68,4 +67,12 @@ Plot verbessern:
 Drainage innerhalb der schichten: 
     model line 57 lösungsbeispiel
     A[h] = 0 
+"""
+"""
+
+print(ss.get_effsigma())
+print(ss.get_e0())
+print(ss.get_Cc())
+
+print(ss.get_Me())
 """

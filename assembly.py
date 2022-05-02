@@ -5,7 +5,7 @@ out: stacked/assembled vectors, ready for model iteration
 """
 import numpy as np
 import layer as lm
-
+yw = 10
 
 class Assembly:
     def __init__(self, layerlist, dt, drainage):
@@ -72,7 +72,9 @@ class Assembly:
         #needed vectors
         dz = self.get_dz()
         k = self.get_k()
-        cv = self.get_cv()
+        #cv = self.get_cv()
+        cv = self.get_k() * self.get_Me() / yw
+
 
         #length of vectors
         rows = len(self.get_dz())
@@ -92,6 +94,35 @@ class Assembly:
         f2[0], f2[-1] = f2[1], f2[-2]
 
         return fv, f1, f2
+
+    # expansion varfactors
+    def get_effsigma(self):
+        array = np.empty((0,), float)
+        effsigmalow = 0
+        for layer in self.layerlist:
+            b = layer.get_effsigma() + effsigmalow
+            array = np.concatenate((array, b))
+            effsigmalow = layer.hlow * layer.gamma
+        return array
+
+    def get_Cc(self):
+        array = np.empty((0,), float)
+        for layer in self.layerlist:
+            b = layer.get_Cc()
+            array = np.concatenate((array, b))
+        return array
+
+    def get_e0(self):
+        array = np.empty((0,), float)
+        for layer in self.layerlist:
+            b = layer.get_e0()
+            array = np.concatenate((array, b))
+        return array
+
+    def get_Me(self):
+        Me = np.log(10) * (1 + self.get_e0())  * self.get_effsigma() / self.get_Cc()
+        Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
+        return Me
 
     # methode zum print aller factors der layers (!<0.5)
     def get_mfact(self):
