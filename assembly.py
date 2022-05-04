@@ -5,6 +5,8 @@ out: stacked/assembled vectors, ready for model iteration
 """
 import numpy as np
 import layer as lm
+import nonlinfactors as nl
+
 yw = 10
 
 class Assembly:
@@ -104,6 +106,17 @@ class Assembly:
             array = np.concatenate((array, b))
             effsigmalow = layer.hlow * layer.gamma
         return array
+
+    def get_effsigma2(self):
+        array = np.empty((0,), float)
+        effsigmalow = 0
+        for layer in self.layerlist:
+            b = layer.get_effsigma() + effsigmalow
+            array = np.concatenate((array, b))
+            effsigmalow = layer.hlow * layer.gamma
+        eff_stress = nl.eff_stress(array)
+        return eff_stress
+
 
     def get_Cc(self):
         array = np.empty((0,), float)

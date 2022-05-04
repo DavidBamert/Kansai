@@ -18,8 +18,9 @@ dt = 100000
 T = 8e8
 
 #layers(self, hup, hlow, k, me, dz, gamma, Cc, e0)
-L = [lm.Layer(0, 10, 1e-9, 1700, dz, 11, 0.4, 0.9),
-     lm.Layer(10, 30, 1e-9, 1700, dz, 12, 0.4, 0.9)
+L = [lm.Layer(0, 10, 1e-9, 1700, dz, 12, 0.4, 0.9),
+     lm.Layer(10, 30, 1e-9, 1700, dz, 12, 0.4, 0.9),
+     lm.Layer(30, 40, 1e-9, 1700, dz, 12, 0.4, 0.9)
      ]
 
 #add 1 dz to the last layers vector
@@ -38,7 +39,7 @@ assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check 
 tl = np.array([
     [0, 1],
     [4e8, 0]
-])
+    ])
 
 #number of graphs
 graphs = 11
@@ -53,7 +54,6 @@ model.get_plot()
 
 
 #assert all(tl[0] % dt == 0), 'tl[0] funktioniert nur, wenn von dt ohne rest geteilt'
-
 
 """
 TODO:
