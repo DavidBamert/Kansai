@@ -4,16 +4,18 @@ import assembly as am
 import layer as lm
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.interpolate import interp2d
+
 yw = 10
 
 class Model:
     def __init__(self, bcs, tl, ss, tt, graphs, dp):
-        self.bcs = bcs  #1mal
         self.tl = tl    #ja
         self.ss = ss    #ja
         self.tt = tt    #ja
         self.graphs = graphs
         self.dp = dp
+
     def get_fixeddata(self):    #this prepares the fix data for the iteration
 
         #create A
@@ -92,7 +94,7 @@ class Model:
 
 
 #solves drained-drained
-    def solve00(self):
+    def solve(self, top_drained=True, bot_drained=True):
 
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
@@ -103,13 +105,15 @@ class Model:
         #get B and udisstot
         B, udisstot = A.copy(), A.copy()
 
+        mask_load = slice(top_drained, rows-bot_drained)
         # FOR LOOP,
         for j in range(0, cols):
 
             #add load at time t
-            for l, (time, load) in enumerate(self.tl):
+            for time, load in self.tl:
                 if ttrack == time:
-                    A[zero] += load
+                    A[mask_load] += load
+
             #internal drainage
             for j in drainvect:
                 A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
@@ -125,6 +129,11 @@ class Model:
             # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
             A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
 
+            if not bot_drained:
+                A[-1] = fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
+            if not top_drained:
+                A[0] = fv[0] * (f1[0] * A[1] - 2 * A[0] + f2[0] * A[1]) + A[0]
+
             deltau = B - A #ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
@@ -134,132 +143,30 @@ class Model:
             ttrack += self.tt.dt
             ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
 
-        return plotmatrix, timelegend, udisstot
-#solves drained-undrained
-    def solve01(self):
+        return Solution(self.ss, plottimes, plotmatrix)
 
-        #get the fixed data
-        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
-        drainvect = self.ss.get_drainvect()
 
-        # FOR LOOP,
-        for j in range(0, cols):
+class Solution:
+    def __init__(self, assembly, times, pore_pressures):
+        self.assembly = assembly
+        self.times = times
+        self.pore_pressures = pore_pressures
 
-            #get the variable data
-            fv, f1, f2 = self.get_variabledata()
+    def plot_pressures(self, plot_times, plot_depths=None):
+        if plot_depths is None:
+            plot_depths = self.assembly.get_dzsum()
 
-            #add load at time t
-            for l, (time, load) in enumerate(self.tl):
-                if ttrack == time:
-                    A[zero] += load
-                    A[-1] += load
+        plot_pressures = interp2d(self.times, self.assembly.get_dzsum(), self.pore_pressures)(plot_times, plot_depths)
+        plt.plot(plot_pressures, -plot_depths, label=plot_times)
+        plt.xlabel("Pore water pressure")
+        plt.ylabel("depth")
+        plt.legend(loc=4, prop={'size': 6})
+        plt.show()
+        return
 
-            #internal drainage
-            for j in drainvect:
-                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
 
-            #save relevant vectors in plot matrix
-                #damit alle dt funktionieren: add 'if i<len(timelegend)''
-            if ttrack >= plottimes[i]:
-                plotmatrix[:, [i]] = np.reshape(A,(rows,1))         #reshape entfernen?
-                timelegend[[i]] = ttrack
-                i += 1
 
-            # iteration zeitvektoren:CALCULATING NEXT TIME STEP
-            # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
-            A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
-            A[-1] = fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
-
-            # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
-            ttrack += self.tt.dt
-            ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
-
-        return plotmatrix, timelegend
-#solves undrained-drained
-    def solve10(self):
-
-        #get the fixed data
-        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
-        drainvect = self.ss.get_drainvect()
-
-        # FOR LOOP,
-        for j in range(0, cols):
-
-            #get the variable data
-            fv, f1, f2 = self.get_variabledata()
-
-            #add load at time t
-            for l, (time, load) in enumerate(self.tl):
-                if ttrack == time:
-                    A[zero] += load
-                    A[0] += load
-
-            #internal drainage
-            for j in drainvect:
-                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
-
-            #save relevant vectors in plot matrix
-                #damit alle dt funktionieren: add 'if i<len(timelegend)''
-            if ttrack >= plottimes[i]:
-                plotmatrix[:, [i]] = np.reshape(A,(rows,1))
-                timelegend[[i]] = ttrack
-                i += 1
-
-            # iteration zeitvektoren:CALCULATING NEXT TIME STEP
-            # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
-            A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
-
-            A[0] =   fv[0] * (f1[0] * A[1] - 2 * A[0] + f2[0] * A[1]) + A[0]
-
-            # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
-            ttrack += self.tt.dt
-            ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
-
-        return plotmatrix, timelegend
-#solves undrained-undrained
-    def solve11(self):
-
-        # get the fixed data
-        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
-        drainvect = self.ss.get_drainvect()
-
-        # FOR LOOP,
-        for j in range(0, cols):
-
-            # get the variable data
-            fv, f1, f2 = self.get_variabledata()
-
-            # add load at time t
-            for l, (time, load) in enumerate(self.tl):
-                if ttrack == time:
-                    A[zero] += load
-                    A[0] += load
-                    A[-1] += load
-            # internal drainage
-            for j in drainvect:
-                A[j] = self.dp  # für drainage innerhalb der schichten A[] = 0 hier einfügen
-
-            # save relevant vectors in plot matrix
-            # damit alle dt funktionieren: add 'if i<len(timelegend)''
-            if ttrack >= plottimes[i]:
-                plotmatrix[:, [i]] = np.reshape(A, (rows, 1))
-                timelegend[[i]] = ttrack
-                i += 1
-
-            # iteration zeitvektoren:CALCULATING NEXT TIME STEP
-            # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
-            A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
-
-            A[0] = fv[0] * (f1[0] * A[1] - 2 * A[0] + f2[0] * A[1]) + A[0]
-            A[-1] = fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
-
-            # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
-            ttrack += self.tt.dt
-            ttrack = round(ttrack, 3)  # dies macht dt robuster (eliminates numerical noise which causes problems)
-
-        return plotmatrix, timelegend
-
-    def get_plot(self):
+    def get_plot(self, **kwargs):
 
         # check mfactors !<0.5
         print('factors for each layer !<0.5')
@@ -268,14 +175,7 @@ class Model:
         #assert all(mfact < 0.5), 'check mfact, mathematically unstable'
 
         #solve while using the correct boundary conditions
-        if self.bcs == [0, 0]:
-            plotmatrix, timelegend, udisstot = self.solve00()
-        elif self.bcs == [0, 1]:
-            plotmatrix, timelegend = self.solve01()
-        elif self.bcs == [1, 0]:
-            plotmatrix, timelegend = self.solve10()
-        elif self.bcs == [1, 1]:
-            plotmatrix, timelegend = self.solve11()
+        plotmatrix, timelegend, udisstot = self.solve(**kwargs)
 
         # plot erstellen
         #dzsum helps plotting without distortion

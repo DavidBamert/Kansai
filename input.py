@@ -50,7 +50,9 @@ tt = tm.Time(T, dt)
 
 #solve the model using FDM
 model = mm.Model(bcs, tl, ss, tt, graphs, dp)
-model.get_plot()
+solution = model.solve(bot_drained=False)
+solution.plot_pressures(np.linspace(0, T, 10))
+# solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50))
 
 
 #assert all(tl[0] % dt == 0), 'tl[0] funktioniert nur, wenn von dt ohne rest geteilt'
