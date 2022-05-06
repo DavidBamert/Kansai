@@ -1,13 +1,9 @@
 
-"""
-in: layervectors 0-n
-out: stacked/assembled vectors, ready for model iteration
-"""
 import numpy as np
-import layer as lm
 import nonlinfactors as nl
 
 yw = 10
+
 
 class Assembly:
     def __init__(self, layerlist, dt, drainage):
@@ -25,9 +21,7 @@ class Assembly:
 
         return np.array(drainvect)
 
-
-
-# dzsum hilft, die kurven unverzerrt zu plotten
+    # dzsum hilft, die kurven unverzerrt zu plotten
     def get_dzsum(self):
         array = np.empty((1,), float)
         hlow = 0
@@ -38,7 +32,7 @@ class Assembly:
             hlow = layer.hlow
         return array
 
-# vektoren, für iteration
+    # Vectors, for iteration
     def get_dz(self):
         array = np.empty((1,), float)
         for layer in self.layerlist:
@@ -63,8 +57,7 @@ class Assembly:
             array = np.concatenate((array, b))
         return array
 
-# faktor vektoren und slices, für iteration
-
+    # Factor vectors and slices, for iteration
     def get_slices(self):
         # up = i-1; zero = i; lo = i+1
         rows = len(self.get_dz())
@@ -75,33 +68,32 @@ class Assembly:
         return up, zero, lo
 
     def get_factors(self):
-        #needed vectors
+        # Needed vectors
         dz = self.get_dz()
         k = self.get_k()
-        #cv = self.get_cv()
+        # cv = self.get_cv()
         cv = self.get_k() * self.get_Me() / yw
 
-
-        #length of vectors
+        # Length of vectors
         rows = len(self.get_dz())
-        #up = i-1; zero = i; lo = i+1
+        # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.get_slices()
-        #initialize
+        # Initialize
         fv = np.zeros((rows,))
         f1 = np.zeros((rows,))
         f2 = np.zeros((rows,))
-        #factor vectors according to formula s.66
+        # Factor vectors according to formula s.66
         fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * self.dt / dz[up] ** 2)
         f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
         f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
-        #complete first and last entry
+        # Complete first and last entry
         fv[0], fv[-1] = fv[1], fv[-2]
         f1[0], f1[-1] = f1[1], f1[-2]
         f2[0], f2[-1] = f2[1], f2[-2]
 
         return fv, f1, f2
 
-    # expansion varfactors
+    # Expansion varfactors
     def get_effsigma(self):
         array = np.empty((1,), float)
         effsigmalow = 0
@@ -112,7 +104,7 @@ class Assembly:
             effsigmalow = array[-1]
         return array
 
-    def get_effsigma2(self):    #wird nicht gebraucht
+    def get_effsigma2(self):    # wird nicht gebraucht
         array = np.empty((1,), float)
         effsigmalow = 0
         for layer in self.layerlist:
@@ -122,7 +114,6 @@ class Assembly:
             effsigmalow = array[-1]
         eff_stress = nl.eff_stress(array)
         return eff_stress
-
 
     def get_Cc(self):
         array = np.empty((1,), float)
@@ -141,19 +132,22 @@ class Assembly:
         return array
 
     def get_Me(self):
-        Me = np.log(10) * (1 + self.get_e0())  * self.get_effsigma() / self.get_Cc()
-        Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
+        Me = np.log(10) * (1 + self.get_e0()) * self.get_effsigma() / self.get_Cc()  # ???
+        Me[0] = Me[1]/2  # adjust the most upper Me, because it must not be 0
         return Me
 
-    # methode zum print aller factors der layers (!<0.5)
+    # Methode to print all layers' factors (!<0.5)
     def get_mfact(self):
         mfact = []
         for layer in self.layerlist:
             factor = layer.cv() * self.dt / layer.dzcorr() ** 2
             mfact.append(factor)
+        print('M factor for each layer !<0.5')
+        print(mfact)
+        assert all(mfact < 0.5), 'check mfact, mathematically unstable'
         return np.array(mfact)
 
-# methode zum print aller vektoren, für kontrolle
+    # Methode to print alle vectors, for control
     def prnt_vect(self):
         dzsum = self.get_dzsum()
         dz = self.get_dz()

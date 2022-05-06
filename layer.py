@@ -1,9 +1,3 @@
-"""
-in: Layer
-out: vectors with layerproperties
-"""
-# hup und hlow sind gemessen von oben (positiv)
-# k: Durchlässigkeit kgross->sehr durchlÃ¤ssig
 
 import numpy as np
 
@@ -21,8 +15,8 @@ class Layer:
         self.Cc = Cc
         self.e0 = e0
 
-#faktoren
-    def height(self):
+    # Factors
+    def height(self):  # this function isn't used
         height = self.hlow - self.hup
         return height
 
@@ -30,17 +24,13 @@ class Layer:
         cv = self.k * self.me / yw
         return cv
 
-        # vector dz erstellen, mit inkrement das ungefÃ¤hr = dz ist. (so dass h genau abgebildet werden kann)
-        # ist nÃ¶tig fÃ¼r den plot, deil dz von layer zu layer anders ist.
-
-#vektoren
+    # Vectors
     def dzcorr(self):
         rows = int((self.hlow - self.hup) / self.dz)
         dzcorr = (self.hlow - self.hup) / rows
         return dzcorr
 
-        #Vektoren für die Iteration
-
+    # Vectors for the iteration
     def get_dzsummed(self):
         dzsumvect = np.arange(0, self.hlow - self.hup + self.dzcorr(), self.dzcorr())
         return dzsumvect
@@ -61,7 +51,7 @@ class Layer:
         cvvect[:] = cv
         return cvvect
 
-#variable expansion
+    # Variable expansion
     def get_effsigma(self):
         effsigma = self.gamma * self.get_dzsummed()
         return effsigma
@@ -76,7 +66,7 @@ class Layer:
         e0vect[:] = self.e0
         return e0vect
 
-#zur kontrolle
+    # For control
     def prnt_vect(self):
         dzvect = self.get_dzvect()
         kvect = self.get_kvect()
