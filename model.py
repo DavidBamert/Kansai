@@ -144,6 +144,10 @@ class Model:
             if not top_drained:
                 A[0] = fv[0] * (f1[0] * A[1] - 2 * A[0] + f2[0] * A[1]) + A[0]
 
+            #internal drainage do it again, so the porewaterpressure doesnt increase (very bad for nonlinear solution)
+            for j in drainvect:
+                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
+
             deltau = B - A #ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
@@ -243,21 +247,21 @@ class Solution:
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
-""" ancient relic
+
     def get_plot(self, **kwargs):
 
         # check mfactors !<0.5
         print('factors for each layer !<0.5')
-        mfact = self.ss.get_mfact()
+        mfact = self.assembly.get_mfact()
         print(mfact)
         #assert all(mfact < 0.5), 'check mfact, mathematically unstable'
 
         #solve while using the correct boundary conditions
-        plotmatrix, timelegend, udisstot = self.solve(**kwargs)
+        plotmatrix, timelegend = self.pore_pressures, self.times
 
         # plot erstellen
         #dzsum helps plotting without distortion
-        dzsum = self.ss.get_dzsum()
+        dzsum = self.assembly.get_dzsum()
         plt.plot(plotmatrix[:], -dzsum, label=timelegend)
         plt.xlabel("Pore water pressure")
         plt.ylabel("depth")
@@ -265,4 +269,3 @@ class Solution:
         plt.show()
 
         #print(udisstot)
-"""
