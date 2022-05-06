@@ -61,6 +61,7 @@ class Model:
         sigma1 = sigma2 - deltau
         #calculate new e
         j=0
+
         for sigma11,sigma22 in zip(sigma1,sigma2): #wie kann man hier fallunterscheiden? !!delta e0 aus jeder iteration müsste summiert sein!!
             if sigma22-sigma11 > 1e-7:
                 e0[j] = e0[j] - Cc[j] * np.log10(sigma22/sigma11)
@@ -196,26 +197,52 @@ class Solution:
 
     def get_settlement(self):
 
-        effsigma, effsigma0 = self.assembly.get_effsigma(), self.assembly.get_effsigma()
+        um =       self.pore_pressures
+        uincrm =   np.zeros(um.shape)
+        sigeffm =  np.zeros(um.shape)
+        evolm =    np.zeros(um.shape)
+        settlemm = np.zeros(um.shape)
+        sigeff0 =  self.assembly.get_effsigma()
+        settlemvect = np.zeros(self.times.shape)
 
-        ut1 = sum(self.pore_pressures[i , 0])
-        ut2 = sum(self.pore_pressures[i+1 , 0])
-        uincr = ut1-ut2
+        i = 1
+        for counter in um[0, 1:]: #calculate uincrements
+            if any(um[:, i-1] - um[:, i] < 0):
+                uincrm[:, i] = 0
+            else:
+                uincrm[:, i] = um[:, i-1] - um[:, i]
+            i += 1
 
-        if any(uincr) < 0:
-            uincr[i] = 0
-        else:
-            uincr
+        sigeffm[:, 0] = sigeff0
+        i = 1
+        for counter in um[0, 1:]:   #calculate sigeff at time t
+            sigeffm[:, i] = sigeffm[:, i-1] + uincrm[:, i]
+            i += 1
 
-        strain = self.assembly.get_Cc()
-        de = -self.assembly.get_Cc() * np.log10(effsigma+uincr/effsigma)
+        i=0
+        Cc = self.assembly.get_Cc()
+        e = self.assembly.get_e0()
+        for counter in um[0,:]:     #calculate strains
+            evolm[1:, i] = Cc[1:] * np.log10(sigeffm[1:, i]/sigeffm[1:, 0]) / (1 + e[1:])
+            i += 1
 
-        return 0
+        i=0
+        for counter in um[0, :]:    #calculate settlement = dz*epsilon
+            settlemm[:, i] = evolm[:, i] * self.assembly.get_dz()
+            i+=1
 
-    def get_dzz(self):
-        z = sum(self.assembly.get_dz()[0:-1])
-        print(z)
-        return z
+        i=0
+        for counter in um[0, :]:
+            settlemvect[i] = sum(settlemm[:, i])
+            i += 1
+
+        plt.plot(self.times, -settlemvect, label = 'Settlement [m]')
+        plt.xlabel("Time [s]")
+        plt.ylabel("Settlement[m]")
+        plt.title('Settlement(t)')
+        plt.legend(loc=2, prop={'size': 6})
+        plt.show()
+
 """ ancient relic
     def get_plot(self, **kwargs):
 

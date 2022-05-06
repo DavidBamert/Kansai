@@ -34,8 +34,7 @@ assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check 
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
-    [0, 1],
-    [0.25e9, 0]
+    [0, 100]
     ])
 
 #number of graphs
@@ -49,10 +48,10 @@ tt = tm.Time(T, dt)
 model = mm.Model(bcs, tl, ss, tt, graphs, dp)
 solution = model.solve(top_drained=True)
 solution.plot_pressures(np.linspace(0, T, 11))
-#solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) beispiel von urias
-solution.get_U()            #Referenzwert 'U=1' ist U(t=0)
+#solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias
 
-solution.get_dzz()
+solution.get_U()            #Referenzwert 'U=1' ist U(t=0)
+solution.get_settlement()
 
 """
 TODO:
