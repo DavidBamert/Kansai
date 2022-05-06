@@ -42,7 +42,7 @@ class Layer:
         #Vektoren für die Iteration
 
     def get_dzsummed(self):
-        dzsumvect = np.arange(0, self.hlow - self.hup, self.dzcorr())
+        dzsumvect = np.arange(0, self.hlow - self.hup + self.dzcorr(), self.dzcorr())
         return dzsumvect
 
     def get_dzvect(self):

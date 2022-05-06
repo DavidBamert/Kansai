@@ -29,33 +29,37 @@ class Assembly:
 
 # dzsum hilft, die kurven unverzerrt zu plotten
     def get_dzsum(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         hlow = 0
         for layer in self.layerlist:
             b = layer.get_dzsummed() + hlow
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
             hlow = layer.hlow
         return array
 
 # vektoren, für iteration
     def get_dz(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         for layer in self.layerlist:
             b = layer.get_dzvect()
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
         return array
 
     def get_k(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         for layer in self.layerlist:
             b = layer.get_kvect()
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
         return array
 
     def get_cv(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         for layer in self.layerlist:
             b = layer.get_cvvect()
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
         return array
 
@@ -99,36 +103,40 @@ class Assembly:
 
     # expansion varfactors
     def get_effsigma(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         effsigmalow = 0
         for layer in self.layerlist:
             b = layer.get_effsigma() + effsigmalow
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
-            effsigmalow = layer.hlow * layer.gamma
+            effsigmalow = array[-1]
         return array
 
-    def get_effsigma2(self):
-        array = np.empty((0,), float)
+    def get_effsigma2(self):    #wird nicht gebraucht
+        array = np.empty((1,), float)
         effsigmalow = 0
         for layer in self.layerlist:
             b = layer.get_effsigma() + effsigmalow
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
-            effsigmalow = layer.hlow * layer.gamma
+            effsigmalow = array[-1]
         eff_stress = nl.eff_stress(array)
         return eff_stress
 
 
     def get_Cc(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         for layer in self.layerlist:
             b = layer.get_Cc()
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
         return array
 
     def get_e0(self):
-        array = np.empty((0,), float)
+        array = np.empty((1,), float)
         for layer in self.layerlist:
             b = layer.get_e0()
+            array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
         return array
 

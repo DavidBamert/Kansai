@@ -23,9 +23,6 @@ L = [lm.Layer(0, 10, 1e-9, 1700, dz, 10, 0.4, 0.9),
      lm.Layer(20, 30, 1e-9, 1700, dz, 12, 0.4, 0.9)
      ]
 
-#add 1 dz to the last layers vector
-L[-1].hlow += L[-1].dz
-
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
 drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
