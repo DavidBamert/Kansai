@@ -175,7 +175,7 @@ class Solution:
         plt.show()
         return
 
-    def get_U(self):
+    def plot_U(self):
 
         ut0 = sum(self.pore_pressures[: , 0])
         Uvector = self.times.copy()
@@ -188,14 +188,14 @@ class Solution:
             Uvector[i] = ut/ut0
             i += 1
 
-        plt.plot(self.times, Uvector, label = 'U')
+        plt.plot(self.times, 1-Uvector, label = 'U')
         plt.xlabel("Time [s]")
         plt.ylabel("avg. consolidation U")
         plt.title('U(t)')
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
-    def get_settlement(self):
+    def plot_settlement(self):
 
         um =       self.pore_pressures
         uincrm =   np.zeros(um.shape)
@@ -240,7 +240,7 @@ class Solution:
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement[m]")
         plt.title('Settlement(t)')
-        plt.legend(loc=2, prop={'size': 6})
+        plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
 """ ancient relic

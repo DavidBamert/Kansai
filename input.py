@@ -51,8 +51,8 @@ solution = model.solve(top_drained=True)
 solution.plot_pressures(np.linspace(0, T, 11))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias
 
-solution.get_U()            #Referenzwert 'U=1' ist U(t=0)
-solution.get_settlement()
+solution.plot_U()            #Referenzwert 'U=1' ist U(t=0)
+solution.plot_settlement()
 
 """
 TODO:
