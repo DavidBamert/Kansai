@@ -144,7 +144,7 @@ class Assembly:
             mfact.append(factor)
         print('M factor for each layer !<0.5')
         print(mfact)
-        assert all(mfact < 0.5), 'check mfact, mathematically unstable'
+        assert all(np.array(mfact) < 0.5), 'check mfact, mathematically unstable'
         return np.array(mfact)
 
     # Methode to print alle vectors, for control

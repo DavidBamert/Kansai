@@ -7,15 +7,15 @@ import numpy as np
 
 
 dz = 0.5
-dt = 1e5  # seconds
+dt = 5e3  # seconds
 
 # Time period
 T = 1e9  # must be in days
 
 # Layers (hup, hlow, k, me, dz, gamma, Cc, e0)
-L = [lm.Layer(0, 10, 1e-9, 1700, dz, 10, 0.4, 0.9),
-     lm.Layer(10, 20, 1e-9, 1700, dz, 20, 0.4, 0.9),
-     lm.Layer(20, 30, 1e-9, 1700, dz, 12, 0.4, 0.9)
+L = [lm.Layer(0, 12, 1e-9, 1700, dz, 12, 0.4, 0.9),
+     lm.Layer(12, 16, 1e-7, 1700, dz, 9, 0.4, 0.9),
+     lm.Layer(16, 28, 1e-9, 1700, dz, 12, 0.4, 0.9)
      ]
 
 # Drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
@@ -41,9 +41,7 @@ graphs = 11  # number of exact solution vectors for U and the interpolation func
 ss = am.Assembly(L, dt, drainage)
 tt = tm.Time(T, dt)  # also graphs?
 
-mfact = ss.get_mfact()
-print(mfact)
-assert all(mfact < 0.5)
+ss.get_mfact()
 
 # Solve the model using FDM
 model = mm.Model(tl, ss, tt, graphs, dp)
