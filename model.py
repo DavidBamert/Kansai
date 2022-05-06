@@ -18,6 +18,12 @@ class Model:
 
     def get_fixeddata(self):    #this prepares the fix data for the iteration
 
+        # check mfactors !<0.5
+        print('factors for each layer !<0.5')
+        mfact = self.ss.get_mfact()
+        print(mfact)
+        assert all(mfact < 0.5), 'check mfact, mathematically unstable'
+
         #create A
         rows = len(self.ss.get_dz())
         A = np.zeros((rows,))
@@ -59,8 +65,12 @@ class Model:
             if sigma22-sigma11 > 1e-7:
                 e0[j] = e0[j] - Cc[j] * np.log10(sigma22/sigma11)
                 j +=1
+
         #calculate new Me
-        i=0
+        Me = np.log(10) * (1 + e0) / Cc * sigma2
+        """
+        #tangentenmodul ist immer besser (?)
+        i = 0
         for sigma11,sigma22 in zip(sigma1,sigma2): #problem with log <- fallunterscheidung für die Me berechnung
             if sigma22-sigma11 < 1e-7:
                 Me[i] = np.log(10) * (1+e0[i]) / Cc[i] * sigma22
@@ -68,6 +78,7 @@ class Model:
             else:
                 Me[i] = (1 + e0[i]) / Cc[i] * (sigma22 - sigma11)/(np.log10(sigma22/sigma11))
                 i +=1
+        """
 
         Me[0] = Me[1] /2 #adjust the most upper Me, because it must not be 0
 
@@ -78,9 +89,7 @@ class Model:
         #up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
         #initialize
-        fv = np.zeros((rows,))
-        f1 = np.zeros((rows,))
-        f2 = np.zeros((rows,))
+        fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
         #factor vectors according to formula s.66
         fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * self.ss.dt / dz[up] ** 2)
         f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
@@ -93,7 +102,7 @@ class Model:
         return fv, f1, f2
 
 
-#solves drained-drained
+#solves all
     def solve(self, top_drained=True, bot_drained=True):
 
         #get the fixed data
@@ -160,12 +169,54 @@ class Solution:
         plt.plot(plot_pressures, -plot_depths, label=plot_times)
         plt.xlabel("Pore water pressure")
         plt.ylabel("depth")
+        plt.title('u(t)-z-diagram')
         plt.legend(loc=4, prop={'size': 6})
         plt.show()
         return
 
+    def get_U(self):
 
+        ut0 = sum(self.pore_pressures[: , 0])
+        Uvector = self.times.copy()
+        wi = self.assembly.get_dz() #weil dz unterschiedlich ist, muss gewichtet werden bzgl dz
+        avgwi = np.mean(wi, (0,))
 
+        i = 0
+        for counter in self.times:
+            ut = sum(self.pore_pressures[:, i] * wi/avgwi)
+            Uvector[i] = ut/ut0
+            i += 1
+
+        plt.plot(self.times, Uvector, label = 'U')
+        plt.xlabel("Time [s]")
+        plt.ylabel("avg. consolidation U")
+        plt.title('U(t)')
+        plt.legend(loc=1, prop={'size': 6})
+        plt.show()
+
+    def get_settlement(self):
+
+        effsigma, effsigma0 = self.assembly.get_effsigma(), self.assembly.get_effsigma()
+
+        ut1 = sum(self.pore_pressures[i , 0])
+        ut2 = sum(self.pore_pressures[i+1 , 0])
+        uincr = ut1-ut2
+
+        if any(uincr) < 0:
+            uincr[i] = 0
+        else:
+            uincr
+
+        strain = self.assembly.get_Cc()
+        de = -self.assembly.get_Cc() * np.log10(effsigma+uincr/effsigma)
+
+        return 0
+
+    def get_dzz(self):
+        z = sum(self.assembly.get_dz()[0:-1])
+        print(z)
+        return z
+""" ancient relic
     def get_plot(self, **kwargs):
 
         # check mfactors !<0.5
@@ -187,3 +238,4 @@ class Solution:
         plt.show()
 
         #print(udisstot)
+"""

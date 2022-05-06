@@ -15,12 +15,12 @@ dz = 0.5
 dt = 100000
 
 #Timeperiod
-T = 8e8
+T = 1e9
 
 #layers(self, hup, hlow, k, me, dz, gamma, Cc, e0)
-L = [lm.Layer(0, 10, 1e-9, 1700, dz, 12, 0.4, 0.9),
-     lm.Layer(10, 30, 1e-9, 1700, dz, 12, 0.4, 0.9),
-     lm.Layer(30, 40, 1e-9, 1700, dz, 12, 0.4, 0.9)
+L = [lm.Layer(0, 10, 1e-9, 1700, dz, 10, 0.4, 0.9),
+     lm.Layer(10, 20, 1e-9, 1700, dz, 20, 0.4, 0.9),
+     lm.Layer(20, 30, 1e-9, 1700, dz, 12, 0.4, 0.9)
      ]
 
 #add 1 dz to the last layers vector
@@ -38,11 +38,11 @@ assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [4e8, 0]
+    [0.25e9, 0]
     ])
 
 #number of graphs
-graphs = 11
+graphs = 1001           #number of exact solution vectors for U and the interpolation function
 
 #create assembly and timee object
 ss = am.Assembly(L, dt, drainage)
@@ -50,12 +50,12 @@ tt = tm.Time(T, dt)
 
 #solve the model using FDM
 model = mm.Model(bcs, tl, ss, tt, graphs, dp)
-solution = model.solve(bot_drained=False)
-solution.plot_pressures(np.linspace(0, T, 10))
-# solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50))
+solution = model.solve(top_drained=True)
+solution.plot_pressures(np.linspace(0, T, 11))
+#solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) beispiel von urias
+solution.get_U()            #Referenzwert 'U=1' ist U(t=0)
 
-
-#assert all(tl[0] % dt == 0), 'tl[0] funktioniert nur, wenn von dt ohne rest geteilt'
+solution.get_dzz()
 
 """
 TODO:

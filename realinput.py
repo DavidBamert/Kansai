@@ -36,7 +36,7 @@ assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
-    [3e9, 0]
+    [2.5e9, 0]
 ])
 
 #number of graphs
