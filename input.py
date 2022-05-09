@@ -28,10 +28,6 @@ drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
-#boundry conditions [upper, lower] 0 drained, 1 undrained
-bcs = [0, 0]
-assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check bcs'
-
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 100]
@@ -45,7 +41,7 @@ ss = am.Assembly(L, dt, drainage)
 tt = tm.Time(T, dt)
 
 #solve the model using FDM
-model = mm.Model(bcs, tl, ss, tt, graphs, dp)
+model = mm.Model(tl, ss, tt, graphs, dp)
 solution = model.solve(bot_drained=True)
 solution.plot_pressures(np.linspace(0, T, 11))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias

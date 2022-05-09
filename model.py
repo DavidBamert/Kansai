@@ -9,7 +9,7 @@ from scipy.interpolate import interp2d
 yw = 10
 
 class Model:
-    def __init__(self, bcs, tl, ss, tt, graphs, dp):
+    def __init__(self, tl, ss, tt, graphs, dp):
         self.tl = tl    #ja
         self.ss = ss    #ja
         self.tt = tt    #ja
