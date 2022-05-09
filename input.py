@@ -34,7 +34,7 @@ tl = np.array([
     ])
 
 #number of graphs
-graphs = 1001           #number of exact solution vectors for U, Settlement s and the interpolation function
+graphs = 1001           #number of exact solution u-vectors for U, Settlement s and the interpolation function
 
 #create assembly and timee object
 ss = am.Assembly(L, dt, drainage)
