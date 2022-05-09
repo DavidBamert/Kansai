@@ -104,7 +104,7 @@ class Model:
 
 
 #solves all
-    def solve(self, top_drained=True, bot_drained=True):
+    def solve(self, top_drained=True, bot_drained=True, non_linear=True):
 
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
@@ -193,6 +193,8 @@ class Solution:
             i += 1
 
         plt.plot(self.times, 1-Uvector, label = 'U')
+        plt.ylim([0, 1])
+        plt.gca().invert_yaxis()
         plt.xlabel("Time [s]")
         plt.ylabel("avg. consolidation U")
         plt.title('U(t)')

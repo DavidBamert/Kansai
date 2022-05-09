@@ -1,4 +1,4 @@
-""""
+"""
 INPUT
 damit dz kleiner gewählt werden kann, muss dt kleiner gewählt werden
 """
@@ -11,19 +11,20 @@ import numpy as np
 
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.1
-dt = 1e4
+dz = 0.5
+dt = 1e5
 
 #Timeperiod
-T = 1e8
+T = 10e8
 
 #layers(self, hup, hlow, k, me, dz, gamma, Cc, e0)
 L = [lm.Layer(0, 10, 1e-9, 1700, dz, 10, 0.4, 0.9),
-     lm.Layer(10, 20, 1e-9, 1700, dz, 20, 0.4, 0.9)
+     lm.Layer(10, 20, 1e-9, 1700, dz, 20, 0.4, 0.9),
+     lm.Layer(20, 30, 1e-9, 1700, dz, 20, 0.4, 0.9)
      ]
 
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
-drainage = [1]
+drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
