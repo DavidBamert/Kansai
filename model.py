@@ -6,15 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp2d
 
-yw = 10
-
 class Model:
-    def __init__(self, tl, ss, tt, graphs, dp):
+    def __init__(self, tl, ss, tt, graphs, dp, yw):
         self.tl = tl    #ja
         self.ss = ss    #ja
         self.tt = tt    #ja
         self.graphs = graphs
         self.dp = dp
+        self.yw = yw
 
     def get_fixeddata(self):    #this prepares the fix data for the iteration
 
@@ -61,12 +60,12 @@ class Model:
         sigma1 = sigma2 - deltau
         #calculate new e
         j=0
-
+        """
         for sigma11,sigma22 in zip(sigma1,sigma2): #wie kann man hier fallunterscheiden? !!delta e0 aus jeder iteration müsste summiert sein!!
             if sigma22-sigma11 > 1e-7:
                 e0[j] = e0[j] - Cc[j] * np.log10(sigma22/sigma11)
                 j +=1
-
+        """
         #calculate new Me
         Me = np.log(10) * (1 + e0) / Cc * sigma2
         """
@@ -83,7 +82,7 @@ class Model:
 
         Me[0] = Me[1] /2 #adjust the most upper Me, because it must not be 0
 
-        cv = self.ss.get_k() * Me / yw
+        cv = self.ss.get_k() * Me / self.yw
 
         #length of vectors
         rows = len(self.ss.get_dz())
@@ -237,6 +236,10 @@ class Solution:
             settlemm[:, i] = evolm[:, i] * self.assembly.get_dz()
             i+=1
 
+        ##korrektur: first and last layer
+        #settlemm[0,:] = settlemm[1,:] + settlemm[1,:] - settlemm[2,:]
+        #settlemm[-1,:] = settlemm[-2,:] + settlemm[-2,:] - settlemm[-3,:]
+
         i=0
         for counter in um[0, :]:
             settlemvect[i] = sum(settlemm[:, i])
@@ -245,10 +248,69 @@ class Solution:
         plt.plot(self.times, -settlemvect, label = 'Settlement [m]')
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement[m]")
-        plt.title('Settlement(t)')
+        plt.title('Settlement(t) 1st version')
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
+        return sigeffm, evolm
+
+    def plot_settlement2(self, tl, dt):
+        self.tl = tl
+        self.dt = dt
+
+        sigeffm, evolm = self.plot_settlement()
+        sigeffmavg = np.zeros(sigeffm.shape)
+        #add the load at time t in drained case
+        #sigeffm[0, :] += 100
+        #sigeffm[-1, :] += 100
+        i=0
+        for time in self.times:
+            for t, l in tl:
+                if t <= time:
+                    sigeffm[0, i] += l
+                    sigeffm[-1, i] += l
+            i+=1
+
+        i=0
+        for counter in sigeffmavg[:-1,0]:
+            sigeffmavg[i,:] = (sigeffm[i,:] + sigeffm[i+1,:]) /2
+            i+=1
+
+        sigeff0 = self.assembly.get_effsigma()
+        sigeff0avg = np.zeros(sigeff0.shape)
+
+        i=0
+        for counter in sigeff0[:-1]:
+            sigeff0avg[i] = (sigeff0[i] + sigeff0[i+1]) /2
+            i+=1
+
+        evolmavg = np.zeros(sigeffmavg.shape)
+        i=0
+        Cc = self.assembly.get_Cc()
+        e = self.assembly.get_e0()
+        for counter in evolmavg[0,:]:     #nur bis :-1 weil der letzte eintrag nicht nötig ist.
+            evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e[:-1])
+            i += 1
+
+        settlemmavg = np.zeros(evolm.shape)
+        i=0
+        for counter in settlemmavg[0, :]:    #calculate settlement = dz*epsilon
+            settlemmavg[:, i] = evolmavg[:, i] * self.assembly.get_dz()
+            i+=1
+
+        settlemvectavg = np.zeros(self.times.shape)
+
+        i=0
+        for counter in settlemmavg[0, :]:
+            settlemvectavg[i] = sum(settlemmavg[:, i])
+            i += 1
+
+        plt.plot(self.times, -settlemvectavg, label = 'Settlement [m]')
+        plt.xlabel("Time [s]")
+        plt.ylabel("Settlement[m]")
+        plt.title('Settlement(t) 2nd version')
+        plt.legend(loc=1, prop={'size': 6})
+        plt.show()
 
     def get_plot(self, **kwargs):
 

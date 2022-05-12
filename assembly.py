@@ -7,13 +7,12 @@ import numpy as np
 import layer as lm
 import nonlinfactors as nl
 
-yw = 10
-
 class Assembly:
-    def __init__(self, layerlist, dt, drainage):
+    def __init__(self, layerlist, dt, drainage, yw):
         self.layerlist = layerlist
         self.dt = dt
         self.drainage = drainage
+        self.yw = yw
 
     def get_drainvect(self):
         drainvect = []
@@ -79,7 +78,7 @@ class Assembly:
         dz = self.get_dz()
         k = self.get_k()
         #cv = self.get_cv()
-        cv = self.get_k() * self.get_Me() / yw
+        cv = self.get_k() * self.get_Me() / self.yw
 
 
         #length of vectors

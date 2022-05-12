@@ -7,11 +7,8 @@ out: vectors with layerproperties
 
 import numpy as np
 
-yw = 10
-
-
 class Layer:
-    def __init__(self, hup, hlow, k, me, dz, gamma, Cc, e0):
+    def __init__(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw):
         self.hup = hup
         self.hlow = hlow
         self.k = k
@@ -20,6 +17,7 @@ class Layer:
         self.gamma = gamma
         self.Cc = Cc
         self.e0 = e0
+        self.yw = yw
 
 #faktoren
     def height(self):
@@ -27,7 +25,7 @@ class Layer:
         return height
 
     def cv(self):
-        cv = self.k * self.me / yw
+        cv = self.k * self.me / self.yw
         return cv
 
         # vector dz erstellen, mit inkrement das ungefÃ¤hr = dz ist. (so dass h genau abgebildet werden kann)
@@ -56,7 +54,7 @@ class Layer:
         return kvect
 
     def get_cvvect(self):
-        cv = self.k * self.me / yw
+        cv = self.k * self.me / self.yw
         cvvect = self.get_dzsummed()
         cvvect[:] = cv
         return cvvect
