@@ -12,14 +12,16 @@ import numpy as np
 yw = 10
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.1
-dt = 2e4
+dz = 0.5
+dt = 1e4
 
 #Timeperiod
-T = 4.32e8
+T = 1.728e9
 
 #layers(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw)
-L = [lm.Layer(0, 12, 1e-9, 1670, dz, 10, 0.6, 1.5, yw)
+L = [lm.Layer(0, 12, 1e-9, 1670, dz, 12, 0.6, 1.5, yw),
+    lm.Layer(12, 16, 1e-7, 1670, 1, 10, 0.6, 1.5, yw),
+    lm.Layer(16, 28, 1e-9, 1670, dz, 15, 0.6, 1.5, yw)
      ]
 
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
@@ -29,8 +31,7 @@ assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more d
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
-    [0, 100],
-    [2e8, 10]
+    [0, 100]
     ])
 
 #number of graphs
