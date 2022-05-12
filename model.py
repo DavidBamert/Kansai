@@ -254,9 +254,9 @@ class Solution:
 
         return sigeffm, evolm
 
-    def plot_settlement2(self, tl, dt):
+#settlement interpolated approach
+    def plot_settlement2(self, tl):
         self.tl = tl
-        self.dt = dt
 
         sigeffm, evolm = self.plot_settlement()
         sigeffmavg = np.zeros(sigeffm.shape)

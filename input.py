@@ -12,7 +12,7 @@ import numpy as np
 yw = 10
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.1
+dz = 0.5
 dt = 2e4
 
 #Timeperiod
@@ -47,7 +47,7 @@ solution.plot_pressures(np.linspace(0, T, 11))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias
 
 solution.plot_U()            #Referenzwert 'U=1' ist U(t=0)
-solution.plot_settlement2(tl, dt)
+solution.plot_settlement2(tl)
 
 
 
