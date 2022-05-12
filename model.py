@@ -200,6 +200,7 @@ class Solution:
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
+#settlement simple approach (top and bottom layer are not calculated)
     def plot_settlement(self):
 
         um =       self.pore_pressures
@@ -261,8 +262,7 @@ class Solution:
         sigeffm, evolm = self.plot_settlement()
         sigeffmavg = np.zeros(sigeffm.shape)
         #add the load at time t in drained case
-        #sigeffm[0, :] += 100
-        #sigeffm[-1, :] += 100
+
         i=0
         for time in self.times:
             for t, l in tl:
@@ -285,9 +285,11 @@ class Solution:
             i+=1
 
         evolmavg = np.zeros(sigeffmavg.shape)
-        i=0
+
         Cc = self.assembly.get_Cc()
         e = self.assembly.get_e0()
+
+        i = 0
         for counter in evolmavg[0,:]:     #nur bis :-1 weil der letzte eintrag nicht nötig ist.
             evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e[:-1])
             i += 1
