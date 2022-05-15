@@ -47,10 +47,6 @@ class Model:
         return fv, f1, f2
 
     def get_updated_factorvectors(self, deltau, udisstot):
-
-
-        #needed vectors
-        Me = self.ss.get_Me()
         dz = self.ss.get_dz()
         k = self.ss.get_k()
         e0 = self.ss.get_e0()
@@ -58,10 +54,10 @@ class Model:
         #calculate sigma1 and sigma2
         sigma2 = self.ss.get_effsigma() + udisstot
         sigma1 = sigma2 - deltau
+        """
         #calculate new e
         j=0
-        """
-        for sigma11,sigma22 in zip(sigma1,sigma2): #wie kann man hier fallunterscheiden? !!delta e0 aus jeder iteration müsste summiert sein!!
+        for sigma11,sigma22 in zip(sigma1,sigma2):
             if sigma22-sigma11 > 1e-7:
                 e0[j] = e0[j] - Cc[j] * np.log10(sigma22/sigma11)
                 j +=1
@@ -80,7 +76,7 @@ class Model:
                 i +=1
         """
 
-        Me[0] = Me[1] /2 #adjust the most upper Me, because it must not be 0
+        Me[0] = Me[1] / 2 #adjust the most upper Me, because it must not be 0
 
         cv = self.ss.get_k() * Me / self.yw
 
@@ -176,7 +172,7 @@ class Solution:
         plt.title('u(t)-z-diagram')
         plt.legend(loc=4, prop={'size': 6})
         plt.show()
-        return
+        return -plot_pressures
 
     def plot_U(self):
 
@@ -311,6 +307,8 @@ class Solution:
         plt.title('Settlement(t) 2nd version')
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
+
+        return -settlemvectavg
 
     def get_plot(self, **kwargs):
 

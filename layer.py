@@ -3,7 +3,6 @@ in: Layer
 out: vectors with layerproperties
 """
 # hup und hlow sind gemessen von oben (positiv)
-# k: Durchlässigkeit kgross->sehr durchlÃ¤ssig
 
 import numpy as np
 
@@ -20,10 +19,6 @@ class Layer:
         self.yw = yw
 
 #faktoren
-    def height(self):
-        height = self.hlow - self.hup
-        return height
-
     def cv(self):
         cv = self.k * self.me / self.yw
         return cv
@@ -74,11 +69,3 @@ class Layer:
         e0vect[:] = self.e0
         return e0vect
 
-#zur kontrolle
-    def prnt_vect(self):
-        dzvect = self.get_dzvect()
-        kvect = self.get_kvect()
-        cvvect = self.get_cvvect()
-        print(dzvect)
-        print(kvect)
-        print(cvvect)

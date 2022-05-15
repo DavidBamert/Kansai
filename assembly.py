@@ -4,8 +4,6 @@ in: layervectors 0-n
 out: stacked/assembled vectors, ready for model iteration
 """
 import numpy as np
-import layer as lm
-import nonlinfactors as nl
 
 class Assembly:
     def __init__(self, layerlist, dt, drainage, yw):
@@ -21,12 +19,8 @@ class Assembly:
             ssnew = Assembly(Lnew, self.dt, [])
             rownew = len(ssnew.get_dz())
             drainvect.append(rownew)
-
         return np.array(drainvect)
 
-
-
-# dzsum hilft, die kurven unverzerrt zu plotten
     def get_dzsum(self):
         array = np.empty((1,), float)
         hlow = 0
@@ -37,7 +31,6 @@ class Assembly:
             hlow = layer.hlow
         return array
 
-# vektoren, für iteration
     def get_dz(self):
         array = np.empty((1,), float)
         for layer in self.layerlist:
@@ -54,24 +47,46 @@ class Assembly:
             array = np.concatenate((array, b))
         return array
 
-    def get_cv(self):
+    def get_Cc(self):
         array = np.empty((1,), float)
         for layer in self.layerlist:
-            b = layer.get_cvvect()
+            b = layer.get_Cc()
             array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
         return array
 
-# faktor vektoren und slices, für iteration
+    def get_e0(self):
+        array = np.empty((1,), float)
+        for layer in self.layerlist:
+            b = layer.get_e0()
+            array = np.delete(array, -1, 0)
+            array = np.concatenate((array, b))
+        return array
+
+    def get_effsigma(self):
+        array = np.empty((1,), float)
+        effsigmalow = 0
+        for layer in self.layerlist:
+            b = layer.get_effsigma() + effsigmalow
+            array = np.delete(array, -1, 0)
+            array = np.concatenate((array, b))
+            effsigmalow = array[-1]
+        return array
+
+    def get_Me(self):
+        Me = np.log(10) * (1 + self.get_e0())  * self.get_effsigma() / self.get_Cc()
+        Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
+        return Me
+
 
     def get_slices(self):
         # up = i-1; zero = i; lo = i+1
         rows = len(self.get_dz())
-
         up = slice(0, rows - 2)
         zero = slice(1, rows - 1)
         lo = slice(2, rows)
         return up, zero, lo
+
 
     def get_factors(self):
         #needed vectors
@@ -79,7 +94,6 @@ class Assembly:
         k = self.get_k()
         #cv = self.get_cv()
         cv = self.get_k() * self.get_Me() / self.yw
-
 
         #length of vectors
         rows = len(self.get_dz())
@@ -100,50 +114,6 @@ class Assembly:
 
         return fv, f1, f2
 
-    # expansion varfactors
-    def get_effsigma(self):
-        array = np.empty((1,), float)
-        effsigmalow = 0
-        for layer in self.layerlist:
-            b = layer.get_effsigma() + effsigmalow
-            array = np.delete(array, -1, 0)
-            array = np.concatenate((array, b))
-            effsigmalow = array[-1]
-        return array
-
-    def get_effsigma2(self):    #wird nicht gebraucht
-        array = np.empty((1,), float)
-        effsigmalow = 0
-        for layer in self.layerlist:
-            b = layer.get_effsigma() + effsigmalow
-            array = np.delete(array, -1, 0)
-            array = np.concatenate((array, b))
-            effsigmalow = array[-1]
-        eff_stress = nl.eff_stress(array)
-        return eff_stress
-
-
-    def get_Cc(self):
-        array = np.empty((1,), float)
-        for layer in self.layerlist:
-            b = layer.get_Cc()
-            array = np.delete(array, -1, 0)
-            array = np.concatenate((array, b))
-        return array
-
-    def get_e0(self):
-        array = np.empty((1,), float)
-        for layer in self.layerlist:
-            b = layer.get_e0()
-            array = np.delete(array, -1, 0)
-            array = np.concatenate((array, b))
-        return array
-
-    def get_Me(self):
-        Me = np.log(10) * (1 + self.get_e0())  * self.get_effsigma() / self.get_Cc()
-        Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
-        return Me
-
     # methode zum print aller factors der layers (!<0.5)
     def get_mfact(self):
         mfact = []
@@ -151,14 +121,3 @@ class Assembly:
             factor = layer.cv() * self.dt / layer.dzcorr() ** 2
             mfact.append(factor)
         return np.array(mfact)
-
-# methode zum print aller vektoren, für kontrolle
-    def prnt_vect(self):
-        dzsum = self.get_dzsum()
-        dz = self.get_dz()
-        k = self.get_k()
-        cv = self.get_cv()
-        print(dzsum)
-        print(dz)
-        print(k)
-        print(cv)

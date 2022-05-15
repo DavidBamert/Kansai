@@ -2,7 +2,6 @@
 this class solves the time discretization and the plot matrix
 """
 import numpy as np
-import layer as lm
 
 class Time:
     def __init__(self, T, dt):
@@ -18,7 +17,6 @@ class Time:
     #plotmatrix: here the vector A is saved
     #timelegend: here the precise time is saved (this is not always equal to plottimes)
     def get_plotmatrix(self, rows, graphs):
-
         plottimes = np.linspace(0, self.T, graphs) #<- here the amount of saved vectors can be chosen
         plotmatrix = np.zeros((rows, len(plottimes)))
         timelegend = np.zeros((len(plottimes), 1))
