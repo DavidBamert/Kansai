@@ -31,7 +31,8 @@ assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more d
 
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
-    [0, 100]
+    [0, 100],
+    [1.296e9, 20]
     ])
 
 #number of graphs
@@ -43,7 +44,7 @@ tt = tm.Time(T, dt)
 
 #solve the model using FDM
 model = mm.Model(tl, ss, tt, graphs, dp, yw)
-solution = model.solve(bot_drained=True)
+solution = model.solve(bot_drained=False)
 press = solution.plot_pressures(np.linspace(0, T, 5))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias
 
