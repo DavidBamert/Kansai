@@ -11,7 +11,7 @@ import numpy as np
 
 yw = 10
 #drainage
-top = False
+top = True
 bot = True
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
