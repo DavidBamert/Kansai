@@ -50,14 +50,15 @@ class Model:
         e0 = self.ss.get_e0()
         Cc = self.ss.get_Cc()
         dt = self.ss.dt
+        effsigma0 = self.ss.get_effsigma()
 
         rows = len(self.ss.get_dz())
         # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
 
         def fun(deltau, udisstot):
-            # calculate sigma2
-            sigma2 = self.ss.get_effsigma() + udisstot
+            # calculate sigma1 (vor it.schritt) and sigma2 (nach it.schritt)
+            sigma2 = effsigma0 + udisstot
             # calculate new Me
             Me = np.log(10) * (1 + e0) / Cc * sigma2
             Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
@@ -206,6 +207,7 @@ class Solution:
         for counter in um[0, 1:]:  # calculate sigeff at time t
             sigeffm[:, i] = sigeffm[:, i - 1] + uincrm[:, i]
             i += 1
+        # immediately add the load at time t in drained points
         i = 0
         for time in self.times:
             for t, l in tl:
