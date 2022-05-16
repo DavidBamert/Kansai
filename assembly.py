@@ -141,7 +141,7 @@ class Assembly:
 
     def get_Me(self):
         Me = np.log(10) * (1 + self.get_e0())  * self.get_effsigma() / self.get_Cc()
-        Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
+        Me[0] = Me[1]/10  #adjust the most upper Me, because it must not be 0
         return Me
 
     # methode zum print aller factors der layers (!<0.5)

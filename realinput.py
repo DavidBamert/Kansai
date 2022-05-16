@@ -29,10 +29,6 @@ drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)), 'more drainages than Layers-1'
 
-#boundry conditions [upper, lower] 0 drained, 1 undrained
-bcs = [0, 0]
-assert bcs == [0, 0] or bcs == [0, 1] or bcs == [1, 0] or bcs == [1, 1], 'check bcs'
-
 # loads in time tl = np.array([[time,load], ... ]) Matrix kann beliebig erweitert werden. Eintrag [0,1] kann IC ersetzen.
 tl = np.array([
     [0, 1],
@@ -46,6 +42,6 @@ graphs = 11
 ss = am.Assembly(L, dt, drainage)
 tt = tm.Time(T, dt)
 
-model = mm.Model(bcs, tl, ss, tt, graphs, dp)
+model = mm.Model(tl, ss, tt, graphs, dp)
 model.get_plot()
 

@@ -242,7 +242,7 @@ class Solution:
         return sigeffm, evolm
 
 #settlement interpolated approach
-    def plot_settlement2(self, tl):
+    def plot_settlement2(self, tl, top_drained=True, bot_drained=True):
         self.tl = tl
 
         sigeffm, evolm = self.plot_settlement()
@@ -253,8 +253,10 @@ class Solution:
         for time in self.times:
             for t, l in tl:
                 if t <= time:
-                    sigeffm[0, i] += l
-                    sigeffm[-1, i] += l
+                    if top_drained:
+                        sigeffm[0, i] += l
+                    if bot_drained:
+                        sigeffm[-1, i] += l
             i+=1
 
         i=0
