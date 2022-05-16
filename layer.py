@@ -1,10 +1,10 @@
 """
-in: Layer
+in: Layer (hup und hlow sind gemessen von oben (positiv)
 out: vectors with layerproperties
 """
-# hup und hlow sind gemessen von oben (positiv)
 
 import numpy as np
+
 
 class Layer:
     def __init__(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw):
@@ -31,8 +31,6 @@ class Layer:
         rows = int((self.hlow - self.hup) / self.dz)
         dzcorr = (self.hlow - self.hup) / rows
         return dzcorr
-
-        #Vektoren für die Iteration
 
     def get_dzsummed(self):
         dzsumvect = np.arange(0, self.hlow - self.hup + self.dzcorr(), self.dzcorr())
@@ -68,4 +66,3 @@ class Layer:
         e0vect = self.get_dzsummed()
         e0vect[:] = self.e0
         return e0vect
-

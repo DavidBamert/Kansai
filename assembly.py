@@ -1,9 +1,10 @@
-
 """
 in: layervectors 0-n
 out: stacked/assembled vectors, ready for model iteration
 """
+
 import numpy as np
+
 
 class Assembly:
     def __init__(self, layerlist, dt, drainage, yw):
@@ -78,7 +79,6 @@ class Assembly:
         Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
         return Me
 
-
     def get_slices(self):
         # up = i-1; zero = i; lo = i+1
         rows = len(self.get_dz())
@@ -87,14 +87,12 @@ class Assembly:
         lo = slice(2, rows)
         return up, zero, lo
 
-
     def get_factors(self):
         #needed vectors
         dz = self.get_dz()
         k = self.get_k()
         #cv = self.get_cv()
         cv = self.get_k() * self.get_Me() / self.yw
-
         #length of vectors
         rows = len(self.get_dz())
         #up = i-1; zero = i; lo = i+1
@@ -111,10 +109,8 @@ class Assembly:
         fv[0], fv[-1] = fv[1], fv[-2]
         f1[0], f1[-1] = f1[1], f1[-2]
         f2[0], f2[-1] = f2[1], f2[-2]
-
         return fv, f1, f2
 
-    # methode zum print aller factors der layers (!<0.5)
     def get_mfact(self):
         mfact = []
         for layer in self.layerlist:

@@ -49,6 +49,6 @@ press = solution.plot_pressures(np.linspace(0, T, 5))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias
 
 solution.plot_U()            #Referenzwert 'U=1' ist U(t=0)
-settle = solution.plot_settlement2(tl)
+settle = solution.plot_settlement(tl)
 
 print('end')

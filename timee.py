@@ -1,7 +1,9 @@
 """
 this class solves the time discretization and the plot matrix
 """
+
 import numpy as np
+
 
 class Time:
     def __init__(self, T, dt):
