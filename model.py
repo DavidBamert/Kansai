@@ -222,7 +222,7 @@ class Solution:
             settlemm[:, i] = evolm[:, i] * self.assembly.get_dz()
             i+=1
 
-        ##korrektur: first and last layer
+        ##korrektur: first and last layer linear erweitern mittels 2&3 eintrag
         #settlemm[0,:] = settlemm[1,:] + settlemm[1,:] - settlemm[2,:]
         #settlemm[-1,:] = settlemm[-2,:] + settlemm[-2,:] - settlemm[-3,:]
 
@@ -246,8 +246,8 @@ class Solution:
 
         sigeffm, evolm = self.plot_settlement()
         sigeffmavg = np.zeros(sigeffm.shape)
-        #add the load at time t in drained case
 
+        #immediately add the load at time t in drained points
         i=0
         for time in self.times:
             for t, l in tl:
