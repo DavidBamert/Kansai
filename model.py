@@ -46,60 +46,63 @@ class Model:
         fv, f1, f2 = self.ss.get_factors()
         return fv, f1, f2
 
-    def get_updated_factorvectors(self, deltau, udisstot):
-
-
+    def get_factor_fun(self):
         #needed vectors
         Me = self.ss.get_Me()
         dz = self.ss.get_dz()
         k = self.ss.get_k()
         e0 = self.ss.get_e0()
         Cc = self.ss.get_Cc()
-        #calculate sigma1 and sigma2
-        sigma2 = self.ss.get_effsigma() + udisstot
-        sigma1 = sigma2 - deltau
-        #calculate new e
-        j=0
-        """
-        for sigma11,sigma22 in zip(sigma1,sigma2): #wie kann man hier fallunterscheiden? !!delta e0 aus jeder iteration müsste summiert sein!!
-            if sigma22-sigma11 > 1e-7:
-                e0[j] = e0[j] - Cc[j] * np.log10(sigma22/sigma11)
-                j +=1
-        """
-        #calculate new Me
-        Me = np.log(10) * (1 + e0) / Cc * sigma2
-        """
-        #tangentenmodul ist immer besser (?)
-        i = 0
-        for sigma11,sigma22 in zip(sigma1,sigma2): #problem with log <- fallunterscheidung für die Me berechnung
-            if sigma22-sigma11 < 1e-7:
-                Me[i] = np.log(10) * (1+e0[i]) / Cc[i] * sigma22
-                i +=1
-            else:
-                Me[i] = (1 + e0[i]) / Cc[i] * (sigma22 - sigma11)/(np.log10(sigma22/sigma11))
-                i +=1
-        """
 
-        Me[0] = Me[1] /2 #adjust the most upper Me, because it must not be 0
-
-        cv = self.ss.get_k() * Me / self.yw
-
-        #length of vectors
         rows = len(self.ss.get_dz())
-        #up = i-1; zero = i; lo = i+1
+        # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
-        #initialize
-        fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
-        #factor vectors according to formula s.66
-        fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * self.ss.dt / dz[up] ** 2)
-        f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
-        f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
-        #complete first and last entry
-        fv[0], fv[-1] = fv[1], fv[-2]
-        f1[0], f1[-1] = f1[1], f1[-2]
-        f2[0], f2[-1] = f2[1], f2[-2]
 
-        return fv, f1, f2
+        def fun(deltau, udisstot):
+            # calculate sigma1 and sigma2
+            sigma2 = self.ss.get_effsigma() + udisstot
+            sigma1 = sigma2 - deltau
+            # calculate new e
+            j = 0
+            """
+            for sigma11,sigma22 in zip(sigma1,sigma2): #wie kann man hier fallunterscheiden? !!delta e0 aus jeder iteration müsste summiert sein!!
+                if sigma22-sigma11 > 1e-7:
+                    e0[j] = e0[j] - Cc[j] * np.log10(sigma22/sigma11)
+                    j +=1
+            """
+            # calculate new Me
+            Me = np.log(10) * (1 + e0) / Cc * sigma2
+            """
+            #tangentenmodul ist immer besser (?)
+            i = 0
+            for sigma11,sigma22 in zip(sigma1,sigma2): #problem with log <- fallunterscheidung für die Me berechnung
+                if sigma22-sigma11 < 1e-7:
+                    Me[i] = np.log(10) * (1+e0[i]) / Cc[i] * sigma22
+                    i +=1
+                else:
+                    Me[i] = (1 + e0[i]) / Cc[i] * (sigma22 - sigma11)/(np.log10(sigma22/sigma11))
+                    i +=1
+            """
+
+            Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
+
+            cv = k * Me / self.yw
+
+            # length of vectors
+            # initialize
+            fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
+            # factor vectors according to formula s.66
+            fv[zero] = np.array(
+                ((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * self.ss.dt / dz[
+                    up] ** 2)
+            f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
+            f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
+            # complete first and last entry
+            fv[0], fv[-1] = fv[1], fv[-2]
+            f1[0], f1[-1] = f1[1], f1[-2]
+            f2[0], f2[-1] = f2[1], f2[-2]
+            return fv, f1, f2
+        return fun
 
 
 #solves all
@@ -111,6 +114,8 @@ class Model:
         fv, f1, f2 = self.get_factorvectors()
         #get drainvector
         drainvect = self.ss.get_drainvect()
+        factor_fun = self.get_factor_fun()
+
         #get B and udisstot
         B, udisstot = A.copy(), A.copy()
 
@@ -150,7 +155,7 @@ class Model:
             deltau = B - A #ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
-            fv, f1, f2 = self.get_updated_factorvectors(deltau, udisstot)
+            fv, f1, f2 = factor_fun(deltau, udisstot)
 
             # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
             ttrack += self.tt.dt
