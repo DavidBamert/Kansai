@@ -54,14 +54,15 @@ class Model:
         e0 = self.ss.get_e0()
         Cc = self.ss.get_Cc()
         dt = self.ss.dt
+        effsigma0 = self.ss.get_effsigma()
 
         rows = len(self.ss.get_dz())
         # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
 
         def fun(deltau, udisstot):
-            # calculate sigma1 and sigma2
-            sigma2 = self.ss.get_effsigma() + udisstot
+            # calculate sigma1 (vor it.schritt) and sigma2 (nach it.schritt)
+            sigma2 = effsigma0 + udisstot
             sigma1 = sigma2 - deltau
 
             # calculate new Me
