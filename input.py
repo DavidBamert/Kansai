@@ -25,12 +25,11 @@ T = 86400 * 1e2
 
 #layers(self, hup, hlow, k, me, dz, gamma, Cc, e0)
 L = [lm.Layer(0, 5, 1e-8, 1670, dz, 12, 0.6, 1.5, yw),
-     lm.Layer(5, 10, 1e-8, 1670, dz, 10, 0.6, 1.5, yw),
-     lm.Layer(10, 20, 1e-8, 1670, dz, 10, 0.6, 1.5, yw)
+     lm.Layer(5, 10, 1e-8, 1670, dz, 10, 0.6, 1.5, yw)
      ]
 
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
-drainage = [1]
+drainage = []
 dp = 0 #could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
