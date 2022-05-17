@@ -55,10 +55,27 @@ class Model:
         # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
 
+        #2nd order dz
+        effsigma0avg = np.zeros(effsigma0.shape)
+        effsigmatavg = np.zeros(effsigma0.shape)
+        epsvolavg = np.zeros(effsigma0.shape)
+        epsvol = np.zeros(effsigma0.shape)
+        dzsecnd = np.zeros(dz.shape)
+
         def fun(deltau, udisstot):
             # calculate sigma1 (vor it.schritt) and sigma2 (nach it.schritt)
             sigma2 = effsigma0 + udisstot
             sigma1 = sigma2 - deltau
+
+            #calculate new dz ; letzter eintrag jeweils 0, weil nicht nötig
+            effsigma0avg[0:-1] = (effsigma0[0:-1] + effsigma0[1:]) / 2
+            effsigmatavg[0:-1] = (sigma2[0:-1] + sigma2[1:]) / 2
+            epsvolavg[0:-1] = Cc[0:-1] * np.log10(effsigmatavg[0:-1]/effsigma0avg[0:-1]) / (1+e0[0:-1])
+            #return from averages to discretization points
+            epsvol[1:-1] = (epsvolavg[0:-2] + epsvolavg[1:-1]) / 2
+            #complete first and last entry <- Annahme
+            epsvol[0], epsvol[-1] = epsvolavg[0], epsvolavg[-1]
+            dzsecnd = dz - (epsvol * dz)
 
             # calculate new Me
             Me = np.log(10) * (1 + e0) / Cc * sigma2
@@ -70,7 +87,7 @@ class Model:
             # initializen factor vectors
             fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
             # factor vectors according to formula s.66
-            fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dz[up] ** 2)
+            fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dzsecnd[up] ** 2)
             f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
             f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
             # complete first and last entry
@@ -104,8 +121,14 @@ class Model:
             for time, load in self.tl:
                 if ttrack == time:
                     A[mask_load] += load
+                    if bot_drained:  #also at time t, add the load as dissipated porepressure at drained locations
+                        udisstot[-1] += load
+                    if top_drained:
+                        udisstot[0] += load
                     for j in drainvect:
                         udisstot[j] += load
+
+
 
             #internal drainage
             for j in drainvect:
