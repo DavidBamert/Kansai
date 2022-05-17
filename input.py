@@ -13,6 +13,8 @@ yw = 10
 #drainage
 top = True
 bot = True
+#second order strains
+scnd = True
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 0.2
@@ -46,7 +48,7 @@ tt = tm.Time(T, dt)
 
 #solve the model using FDM
 model = mm.Model(tl, ss, tt, graphs, dp, yw)
-solution = model.solve(top_drained=top, bot_drained=bot)
+solution = model.solve(top_drained=top, bot_drained=bot, sec_order_strains=scnd)
 solution.plot_pressures(np.linspace(0, T, 11))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) #beispiel von urias
 

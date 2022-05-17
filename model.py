@@ -50,8 +50,9 @@ class Model:
         Cc = self.ss.get_Cc()
         dt = self.ss.dt
         effsigma0 = self.ss.get_effsigma()
-
         rows = len(self.ss.get_dz())
+        # initializen factor vectors
+        fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
         # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
 
@@ -62,32 +63,30 @@ class Model:
         epsvol = np.zeros(effsigma0.shape)
         dzsecnd = np.zeros(dz.shape)
 
-        def fun(deltau, udisstot):
+        def fun(deltau, udisstot, sec_order_strains):
             # calculate sigma1 (vor it.schritt) and sigma2 (nach it.schritt)
             sigma2 = effsigma0 + udisstot
-            sigma1 = sigma2 - deltau
-
-            #calculate new dz ; letzter eintrag jeweils 0, weil nicht nötig
-            effsigma0avg[0:-1] = (effsigma0[0:-1] + effsigma0[1:]) / 2
-            effsigmatavg[0:-1] = (sigma2[0:-1] + sigma2[1:]) / 2
-            epsvolavg[0:-1] = Cc[0:-1] * np.log10(effsigmatavg[0:-1]/effsigma0avg[0:-1]) / (1+e0[0:-1])
-            #return from averages to discretization points
-            epsvol[1:-1] = (epsvolavg[0:-2] + epsvolavg[1:-1]) / 2
-            #complete first and last entry <- Annahme
-            epsvol[0], epsvol[-1] = epsvolavg[0], epsvolavg[-1]
-            dzsecnd = dz - (epsvol * dz)
 
             # calculate new Me
             Me = np.log(10) * (1 + e0) / Cc * sigma2
-
             Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
 
             cv = k * Me / self.yw
 
-            # initializen factor vectors
-            fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
-            # factor vectors according to formula s.66
-            fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dzsecnd[up] ** 2)
+            if sec_order_strains:
+                # calculate new dz ; letzter eintrag jeweils 0, weil nicht nötig
+                effsigma0avg[0:-1] = (effsigma0[0:-1] + effsigma0[1:]) / 2
+                effsigmatavg[0:-1] = (sigma2[0:-1] + sigma2[1:]) / 2
+                epsvolavg[0:-1] = Cc[0:-1] * np.log10(effsigmatavg[0:-1] / effsigma0avg[0:-1]) / (1 + e0[0:-1])
+                # return from averages to discretization points
+                epsvol[1:-1] = (epsvolavg[0:-2] + epsvolavg[1:-1]) / 2
+                # complete first and last entry <- Annahme
+                epsvol[0], epsvol[-1] = epsvolavg[0], epsvolavg[-1]
+                dzsecnd = dz - (epsvol * dz)
+                fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dzsecnd[up] ** 2)
+            if not sec_order_strains:
+                fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dz[up] ** 2)
+
             f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
             f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
             # complete first and last entry
@@ -99,7 +98,7 @@ class Model:
 
 
 #solves all
-    def solve(self, top_drained=True, bot_drained=True, non_linear=True):
+    def solve(self, top_drained=True, bot_drained=True, non_linear=True, sec_order_strains=True):
 
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
@@ -157,7 +156,7 @@ class Model:
             deltau = B - A #ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
-            fv, f1, f2 = factor_fun(deltau, udisstot)
+            fv, f1, f2 = factor_fun(deltau, udisstot, sec_order_strains)
 
             # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
             ttrack += dt
