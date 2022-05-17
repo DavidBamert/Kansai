@@ -18,8 +18,8 @@ class Assembly:
         drainvect = []
         for i in self.drainage:
             Lnew = self.layerlist[0:i]
-            ssnew = Assembly(Lnew, self.dt, [])
-            rownew = len(ssnew.get_dz())
+            ssnew = Assembly(Lnew, self.dt, [], self.yw)
+            rownew = len(ssnew.get_dz())-1
             drainvect.append(rownew)
 
         return np.array(drainvect)

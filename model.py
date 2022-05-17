@@ -100,6 +100,7 @@ class Model:
         #get B and udisstot
         B, udisstot = A.copy(), A.copy()
 
+        dt = self.tt.dt
         mask_load = slice(top_drained, rows-bot_drained)
         # FOR LOOP,
         for j in range(0, cols):
@@ -108,6 +109,8 @@ class Model:
             for time, load in self.tl:
                 if ttrack == time:
                     A[mask_load] += load
+                    for j in drainvect:
+                        udisstot[j] += load
 
             #internal drainage
             for j in drainvect:
@@ -139,7 +142,7 @@ class Model:
             fv, f1, f2 = factor_fun(deltau, udisstot)
 
             # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
-            ttrack += self.tt.dt
+            ttrack += dt
             ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
 
         return Solution(self.ss, plottimes, plotmatrix)
@@ -248,7 +251,7 @@ class Solution:
         sigeffm, evolm = self.plot_settlement()
         sigeffmavg = np.zeros(sigeffm.shape)
 
-        #immediately add the load at time t in drained points
+        #immediately add the load at time t(and forward) in drained points
         i=0
         for time in self.times:
             for t, l in tl:
@@ -257,6 +260,8 @@ class Solution:
                         sigeffm[0, i] += l
                     if bot_drained:
                         sigeffm[-1, i] += l
+                    for j in self.assembly.get_drainvect():
+                        sigeffm[j, i] += l
             i+=1
 
         i=0
@@ -296,6 +301,8 @@ class Solution:
             i += 1
 
         plt.plot(self.times, -settlemvectavg, label = 'Settlement [m]')
+        plt.ylim([0, -settlemvectavg[-1]-0.1])
+        plt.gca().invert_yaxis()
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement[m]")
         plt.title('Settlement(t) 2nd version')
