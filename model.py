@@ -41,11 +41,6 @@ class Model:
 
         return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
 
-    def get_factorvectors(self): #this prepares (and in the future alters) the variable data for the iteration
-        #change fi and dz
-        fv, f1, f2 = self.ss.get_factors()
-        return fv, f1, f2
-
     def get_factor_fun(self):
         #needed vectors
         Me = self.ss.get_Me()
@@ -92,7 +87,7 @@ class Model:
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
         # get the factors
-        fv, f1, f2 = self.get_factorvectors()
+        fv, f1, f2 = self.ss.get_factors()
         #get drainvector
         drainvect = self.ss.get_drainvect()
         factor_fun = self.get_factor_fun()
@@ -234,14 +229,14 @@ class Solution:
         for counter in um[0, :]:
             settlemvect[i] = sum(settlemm[:, i])
             i += 1
-
+        """
         plt.plot(self.times, -settlemvect, label = 'Settlement [m]')
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement[m]")
         plt.title('Settlement(t) 1st version')
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
-
+        """
         return sigeffm, evolm
 
 #settlement interpolated approach
