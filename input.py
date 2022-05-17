@@ -17,15 +17,15 @@ bot = True
 scnd = True
 
 #discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.2
-dt = 1e2
+dz = 0.5
+dt = 1e4
 
 #Timeperiod
-T = 86400 * 1e2
+T = 86400 * 20e3
 
 #layers(self, hup, hlow, k, me, dz, gamma, Cc, e0)
-L = [lm.Layer(0, 5, 1e-8, 1670, dz, 12, 0.6, 1.5, yw),
-     lm.Layer(5, 10, 1e-8, 1670, dz, 10, 0.6, 1.5, yw)
+L = [lm.Layer(0, 10, 1e-8, 1670, dz, 12, 0.6, 1.5, yw),
+     lm.Layer(10, 50, 1e-9, 1670, dz, 10, 0.6, 1.5, yw)
      ]
 
 #drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)

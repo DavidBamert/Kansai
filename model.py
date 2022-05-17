@@ -160,7 +160,7 @@ class Model:
 
             # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
             ttrack += dt
-            ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
+            #ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
 
         return Solution(self.ss, plottimes, plotmatrix)
 
