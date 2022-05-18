@@ -38,11 +38,6 @@ class Model:
 
         return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
 
-    def get_factorvectors(self): #this prepares (and in the future alters) the variable data for the iteration
-        #change fi and dz
-        fv, f1, f2 = self.ss.get_factors()
-        return fv, f1, f2
-
     def get_factor_fun(self):
         #needed vectors
         dz = self.ss.get_dz()
@@ -85,12 +80,13 @@ class Model:
         #get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
         # get the factors
-        fv, f1, f2 = self.get_factorvectors()
+        fv, f1, f2 = self.ss.get_factors()
         factor_fun = self.get_factor_fun()
         #get drainvector
         drainvect = self.ss.get_drainvect()
 
         udisstot = A.copy()
+        dt = self.tt.dt
         mask_load = slice(top_drained, rows-bot_drained)
 
         # FOR LOOP
@@ -101,13 +97,13 @@ class Model:
                 if ttrack == time:
                     A[mask_load] += load
 
-            #internal drainage
+            # internal drainage
             for j in drainvect:
-                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
-            #save relevant vectors in plot matrix
-            #damit alle dt funktionieren: add 'if i<len(timelegend)''
+                A[j] = self.dp  # für drainage innerhalb der schichten A[] = 0 hier einfügen
+            # save relevant vectors in plot matrix
+            # damit alle dt funktionieren: add 'if i<len(timelegend)'
             if ttrack >= plottimes[i]:
-                plotmatrix[:, [i]] = np.reshape(A,(rows,1))
+                plotmatrix[:, [i]] = np.reshape(A, (rows, 1))
                 timelegend[[i]] = ttrack
                 i += 1
 
@@ -131,8 +127,8 @@ class Model:
             fv, f1, f2 = factor_fun(deltau, udisstot)
 
             # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
-            ttrack += self.tt.dt
-            ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
+            ttrack += dt
+            #ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
 
         return Solution(self.ss, plottimes, plotmatrix)
 
@@ -207,7 +203,7 @@ class Solution:
         for counter in um[0, 1:]:  # calculate sigeff at time t
             sigeffm[:, i] = sigeffm[:, i - 1] + uincrm[:, i]
             i += 1
-        # immediately add the load at time t in drained points
+        # immediately add the load at time t (and forward) in drained points
         i = 0
         for time in self.times:
             for t, l in tl:
@@ -244,6 +240,8 @@ class Solution:
             i += 1
 
         plt.plot(self.times, -settlemvectavg, label='Settlement [m]')
+        plt.ylim([0, -settlemvectavg[-1]-0.1])
+        plt.gca().invert_yaxis()
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement [m]")
         plt.title('Settlement(t) 2nd version')
