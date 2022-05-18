@@ -5,9 +5,9 @@ from scipy.interpolate import interp2d
 
 class Model:
     def __init__(self, tl, ss, tt, graphs, dp, yw):
-        self.tl = tl    #ja
-        self.ss = ss    #ja
-        self.tt = tt    #ja
+        self.tl = tl
+        self.ss = ss
+        self.tt = tt
         self.graphs = graphs
         self.dp = dp
         self.yw = yw
@@ -20,50 +20,67 @@ class Model:
         print(mfact)
         assert all(mfact < 0.5), 'check mfact, mathematically unstable'
 
-        #create A
+        # create A
         rows = len(self.ss.get_dz())
         A = np.zeros((rows,))
 
-        #get factors and slices <-bcs
+        # get factors and slices <-bcs
         up, zero, lo = self.ss.get_slices()
-
-        #get time discretization and plot
+        # get time discretization and plot
         cols = self.tt.get_cols()
         plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.graphs)
-
-        #ttrack = timetracker
+        # ttrack = timetracker
         ttrack = 0
-        #i = column number of plotmatrix
+        # i = column number of plotmatrix
         i = 0
 
         return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
 
     def get_factor_fun(self):
-        #needed vectors
+
+        # needed vectors
+        rows = len(self.ss.get_dz())
         dz = self.ss.get_dz()
         k = self.ss.get_k()
         e0 = self.ss.get_e0()
         Cc = self.ss.get_Cc()
         dt = self.ss.dt
         effsigma0 = self.ss.get_effsigma()
-
-        rows = len(self.ss.get_dz())
+        # initializen factor vectors
+        fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
         # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.ss.get_slices()
 
-        def fun(deltau, udisstot):
-            # calculate sigma1 (vor it.schritt) and sigma2 (nach it.schritt)
+        # 2nd order dz
+        effsigma0avg = np.zeros(effsigma0.shape)
+        effsigmatavg = np.zeros(effsigma0.shape)
+        epsvolavg = np.zeros(effsigma0.shape)
+        epsvol = np.zeros(effsigma0.shape)
+
+        def fun(udisstot, sec_order_strains):
+            # calculate sigma1 (before it.step) and sigma2 (after it.step)
             sigma2 = effsigma0 + udisstot
+
             # calculate new Me
             Me = np.log(10) * (1 + e0) / Cc * sigma2
             Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
 
             cv = k * Me / self.yw
 
-            # initializen factor vectors
-            fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
-            # factor vectors according to formula s.66
-            fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dz[up] ** 2)
+            if sec_order_strains:
+                # calculate new dz; last entry always 0, because useless
+                effsigma0avg[0:-1] = (effsigma0[0:-1] + effsigma0[1:]) / 2
+                effsigmatavg[0:-1] = (sigma2[0:-1] + sigma2[1:]) / 2
+                epsvolavg[0:-1] = Cc[0:-1] * np.log10(effsigmatavg[0:-1] / effsigma0avg[0:-1]) / (1 + e0[0:-1])
+                # return from averages to discretization points
+                epsvol[1:-1] = (epsvolavg[0:-2] + epsvolavg[1:-1]) / 2
+                # complete first and last entry <- assumption
+                epsvol[0], epsvol[-1] = epsvolavg[0], epsvolavg[-1]
+                dzsecnd = dz - (epsvol * dz)
+                fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dzsecnd[up] ** 2)
+            if not sec_order_strains:
+                fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * dt / dz[up] ** 2)
+
             f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
             f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
             # complete first and last entry
@@ -74,15 +91,14 @@ class Model:
         return fun
 
 
-#solves all
-    def solve(self, top_drained=True, bot_drained=True, non_linear=True):
+    # solves all
+    def solve(self, top_drained=True, bot_drained=True, non_linear=True, sec_order_strains=True):
 
-        #get the fixed data
+        # get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
-        # get the factors
+
         fv, f1, f2 = self.ss.get_factors()
         factor_fun = self.get_factor_fun()
-        #get drainvector
         drainvect = self.ss.get_drainvect()
 
         udisstot = A.copy()
@@ -92,26 +108,30 @@ class Model:
         # FOR LOOP
         for j in range(0, cols):
 
-            #add load at time t
+            # add load at time t
             for time, load in self.tl:
                 if ttrack == time:
                     A[mask_load] += load
+                    if bot_drained:  # also at time t, add the load as dissipated pore pressure at drained locations
+                        udisstot[-1] += load
+                    if top_drained:
+                        udisstot[0] += load
                     for j in drainvect:
                         udisstot[j] += load
 
             # internal drainage
             for j in drainvect:
-                A[j] = self.dp  # für drainage innerhalb der schichten A[] = 0 hier einfügen
+                A[j] = self.dp  # for drainage in layer A[] = 0 insert here
             # save relevant vectors in plot matrix
-            # damit alle dt funktionieren: add 'if i<len(timelegend)'
+            # so that all dt works: add 'if i<len(timelegend)'
             if ttrack >= plottimes[i]:
                 plotmatrix[:, [i]] = np.reshape(A, (rows, 1))
                 timelegend[[i]] = ttrack
                 i += 1
 
             B = A.copy()
-            # iteration zeitvektoren: CALCULATING NEXT TIME STEP
-            # Übergangsbedingung eignet sich als allgemeinere Formel! (Buch s.66)
+            # iteration time vectors: CALCULATING NEXT TIME STEP
+            # transition condition is suitable as a more general formula! (LHAP page 66)
             A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
 
             if not bot_drained:
@@ -119,18 +139,18 @@ class Model:
             if not top_drained:
                 A[0] = fv[0] * (f1[0] * A[1] - 2 * A[0] + f2[0] * A[1]) + A[0]
 
-            #internal drainage do it again, so the porewaterpressure doesnt increase (very bad for nonlinear solution)
+            # internal drainage do it again, so the pore water pressure doesn't increase (very bad for nonlinear solution)
             for j in drainvect:
-                A[j] = self.dp #für drainage innerhalb der schichten A[] = 0 hier einfügen
+                A[j] = self.dp  # for drainage in layer A[] = 0 insert here
 
-            deltau = B - A #ppressure change
+            deltau = B - A  # ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
-            fv, f1, f2 = factor_fun(deltau, udisstot)
+            fv, f1, f2 = factor_fun(udisstot, sec_order_strains)
 
-            # timetracker: tt hat immer die Einheit der aktuellen Zeit in der Iteration (-> brauchbar für Zeiten des plots, und variable Lasten)
+            # timetracker: tt always has the unit of the current time in the iteration (-> useful for times of plots, and variable loads)
             ttrack += dt
-            #ttrack = round(ttrack, 3)   #dies macht dt robuster (eliminates numerical noise which causes problems)
+            #ttrack = round(ttrack, 3)  # it makes dt more robust (eliminates numerical noise which causes problems)
 
         return Solution(self.ss, plottimes, plotmatrix)
 
@@ -158,7 +178,7 @@ class Solution:
 
         ut0 = sum(self.pore_pressures[:, 0])
         Uvector = self.times.copy()
-        wi = self.assembly.get_dz() #weil dz unterschiedlich ist, muss gewichtet werden bzgl dz
+        wi = self.assembly.get_dz()  # because dz is different, it must be weighted relative to dz
         avgwi = np.mean(wi, (0,))
 
         i = 0
@@ -177,8 +197,8 @@ class Solution:
         plt.show()
 
 
-#settlement interpolated approach
-    def plot_settlement(self, tl):
+    # settlement interpolated approach
+    def plot_settlement(self, tl, top_drained=True, bot_drained=True):
         self.tl = tl
 
         um = self.pore_pressures
@@ -210,12 +230,10 @@ class Solution:
         for time in self.times:
             for t, l in tl:
                 if t <= time:
-                    """
                     if top_drained:
                         sigeffm[0, i] += l
                     if bot_drained:
                         sigeffm[-1, i] += l
-                    """
                     for j in self.assembly.get_drainvect():
                         sigeffm[j, i] += l
             i += 1
@@ -230,13 +248,13 @@ class Solution:
         i = 0
         Cc = self.assembly.get_Cc()
         e = self.assembly.get_e0()
-        for counter in evolmavg[0, :]:     #nur bis :-1 weil der letzte eintrag nicht nötig ist.
+        for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
             evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e[:-1])
             i += 1
 
         settlemmavg = np.zeros(um.shape)
         i = 0
-        for counter in settlemmavg[0, :]:    #calculate settlement = dz*epsilon
+        for counter in settlemmavg[0, :]:  # calculate settlement = dz*epsilon
             settlemmavg[:, i] = evolmavg[:, i] * self.assembly.get_dz()
             i += 1
 
@@ -248,11 +266,11 @@ class Solution:
             i += 1
 
         plt.plot(self.times, -settlemvectavg, label='Settlement [m]')
-        plt.ylim([0, -settlemvectavg[-1]-0.1])
+        plt.ylim([0, -settlemvectavg[-1] - 0.1])
         plt.gca().invert_yaxis()
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement [m]")
-        plt.title('Settlement(t) 2nd version')
+        plt.title('Settlement(t)')
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 

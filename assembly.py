@@ -1,5 +1,5 @@
 """
-in: layervectors 0-n
+in: layer vectors 0-n
 out: stacked/assembled vectors, ready for model iteration
 """
 
@@ -75,8 +75,8 @@ class Assembly:
         return array
 
     def get_Me(self):
-        Me = np.log(10) * (1 + self.get_e0())  * self.get_effsigma() / self.get_Cc()
-        Me[0] = Me[1]/2 #adjust the most upper Me, because it must not be 0
+        Me = np.log(10) * (1 + self.get_e0()) * self.get_effsigma() / self.get_Cc()
+        Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
         return Me
 
     def get_slices(self):
@@ -88,24 +88,23 @@ class Assembly:
         return up, zero, lo
 
     def get_factors(self):
-        #needed vectors
+        # needed vectors
         dz = self.get_dz()
         k = self.get_k()
-        #cv = self.get_cv()
         cv = self.get_k() * self.get_Me() / self.yw
-        #length of vectors
+        # length of vectors
         rows = len(self.get_dz())
-        #up = i-1; zero = i; lo = i+1
+        # up = i-1; zero = i; lo = i+1
         up, zero, lo = self.get_slices()
-        #initialize
+        # initialize
         fv = np.zeros((rows,))
         f1 = np.zeros((rows,))
         f2 = np.zeros((rows,))
-        #factor vectors according to formula s.66
+        # factor vectors according to formula from LHAP page 66
         fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * self.dt / dz[up] ** 2)
         f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
         f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
-        #complete first and last entry
+        # complete first and last entry
         fv[0], fv[-1] = fv[1], fv[-2]
         f1[0], f1[-1] = f1[1], f1[-2]
         f2[0], f2[-1] = f2[1], f2[-2]

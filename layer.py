@@ -1,6 +1,6 @@
 """
-in: Layer (hup und hlow sind gemessen von oben (positiv)
-out: vectors with layerproperties
+in: Layer (hup und hlow are measured from above (positive))
+out: vectors with layer properties
 """
 
 import numpy as np
@@ -18,15 +18,13 @@ class Layer:
         self.e0 = e0
         self.yw = yw
 
-#faktoren
     def cv(self):
         cv = self.k * self.me / self.yw
         return cv
 
-        # vector dz erstellen, mit inkrement das ungefÃ¤hr = dz ist. (so dass h genau abgebildet werden kann)
-        # ist nÃ¶tig fÃ¼r den plot, deil dz von layer zu layer anders ist.
-
-#vektoren
+# vectors
+    # build vector dz, with an increment that is approximately = dz (so that h can be correctly represented)
+    # is necessary for the plot, because dz differs from layer to layer
     def dzcorr(self):
         rows = int((self.hlow - self.hup) / self.dz)
         dzcorr = (self.hlow - self.hup) / rows
@@ -52,7 +50,7 @@ class Layer:
         cvvect[:] = cv
         return cvvect
 
-#variable expansion
+# variable expansion
     def get_effsigma(self):
         effsigma = self.gamma * self.get_dzsummed()
         return effsigma
