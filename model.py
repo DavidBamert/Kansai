@@ -96,6 +96,8 @@ class Model:
             for time, load in self.tl:
                 if ttrack == time:
                     A[mask_load] += load
+                    for j in drainvect:
+                        udisstot[j] += load
 
             # internal drainage
             for j in drainvect:
@@ -208,8 +210,14 @@ class Solution:
         for time in self.times:
             for t, l in tl:
                 if t <= time:
-                    sigeffm[0, i] += l
-                    sigeffm[-1, i] += l
+                    """
+                    if top_drained:
+                        sigeffm[0, i] += l
+                    if bot_drained:
+                        sigeffm[-1, i] += l
+                    """
+                    for j in self.assembly.get_drainvect():
+                        sigeffm[j, i] += l
             i += 1
 
         sigeffmavg = np.zeros(sigeffm.shape)
