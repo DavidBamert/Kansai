@@ -64,20 +64,20 @@ class Assembly:
             array = np.concatenate((array, b))
         return array
 
-    def get_effsigma(self):
+    def get_effsigma0(self):
         array = np.empty((1,), float)
-        effsigmalow = 0
+        effsigma0low = 0
         for layer in self.layerlist:
-            b = layer.get_effsigma() + effsigmalow
+            b = layer.get_effsigma0() + effsigma0low
             array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
-            effsigmalow = array[-1]
+            effsigma0low = array[-1]
         return array
 
-    def get_Me(self):
-        Me = np.log(10) * (1 + self.get_e0()) * self.get_effsigma() / self.get_Cc()
-        Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
-        return Me
+    def get_Me0(self):
+        Me0 = np.log(10) * (1 + self.get_e0()) * self.get_effsigma0() / self.get_Cc()
+        Me0[0] = Me0[1] / 2  # adjust the most upper Me, because it must not be 0
+        return Me0
 
     def get_slices(self):
         # up = i-1; zero = i; lo = i+1
@@ -87,11 +87,11 @@ class Assembly:
         lo = slice(2, rows)
         return up, zero, lo
 
-    def get_factors(self):
+    def get_factors0(self):
         # needed vectors
         dz = self.get_dz()
         k = self.get_k()
-        cv = self.get_k() * self.get_Me() / self.yw
+        cv0 = self.get_k() * self.get_Me0() / self.yw
         # length of vectors
         rows = len(self.get_dz())
         # up = i-1; zero = i; lo = i+1
@@ -101,7 +101,7 @@ class Assembly:
         f1 = np.zeros((rows,))
         f2 = np.zeros((rows,))
         # factor vectors according to formula from LHAP page 66
-        fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv[zero] * k[up] / cv[up] / k[zero])) * cv[zero] * self.dt / dz[up] ** 2)
+        fv[zero] = np.array(((1 + k[up] / k[zero]) / (1 + cv0[zero] * k[up] / cv0[up] / k[zero])) * cv0[zero] * self.dt / dz[up] ** 2)
         f1[zero] = np.array(2 * k[up] / (k[zero] + k[up]))
         f2[zero] = np.array(2 * k[zero] / (k[zero] + k[up]))
         # complete first and last entry
@@ -110,9 +110,9 @@ class Assembly:
         f2[0], f2[-1] = f2[1], f2[-2]
         return fv, f1, f2
 
-    def get_mfact(self):
-        mfact = []
+    def get_mfact0(self):
+        mfact0 = []
         for layer in self.layerlist:
-            factor = layer.cv() * self.dt / layer.dzcorr() ** 2
-            mfact.append(factor)
-        return np.array(mfact)
+            factor = layer.cv0() * self.dt / layer.dzcorr() ** 2
+            mfact0.append(factor)
+        return np.array(mfact0)

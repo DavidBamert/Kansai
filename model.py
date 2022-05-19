@@ -14,27 +14,17 @@ class Model:
 
     def get_fixeddata(self):
 
-        # check mfactors !<0.5
-        print('factors for each layer !<0.5')
-        mfact = self.ss.get_mfact()
-        print(mfact)
-        assert all(mfact < 0.5), 'check mfact, mathematically unstable'
-
         # create A
         rows = len(self.ss.get_dz())
         A = np.zeros((rows,))
-
         # get factors and slices <-bcs
         up, zero, lo = self.ss.get_slices()
         # get time discretization and plot
         cols = self.tt.get_cols()
         plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.graphs)
-        # ttrack = timetracker
-        ttrack = 0
-        # i = column number of plotmatrix
-        i = 0
+        dt = self.tt.dt
 
-        return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i
+        return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, dt
 
     def get_factor_fun(self):
 
@@ -45,7 +35,7 @@ class Model:
         e0 = self.ss.get_e0()
         Cc = self.ss.get_Cc()
         dt = self.ss.dt
-        effsigma0 = self.ss.get_effsigma()
+        effsigma0 = self.ss.get_effsigma0()
         # initializen factor vectors
         fv, f1, f2 = np.zeros((rows,)), np.zeros((rows,)), np.zeros((rows,))
         # up = i-1; zero = i; lo = i+1
@@ -66,6 +56,7 @@ class Model:
             Me[0] = Me[1] / 2  # adjust the most upper Me, because it must not be 0
 
             cv = k * Me / self.yw
+            dzsecnd = dz
 
             if sec_order_strains:
                 # calculate new dz; last entry always 0, because useless
@@ -87,25 +78,34 @@ class Model:
             fv[0], fv[-1] = fv[1], fv[-2]
             f1[0], f1[-1] = f1[1], f1[-2]
             f2[0], f2[-1] = f2[1], f2[-2]
-            return fv, f1, f2
+            return fv, f1, f2, cv, dzsecnd
         return fun
 
 
     # solves all
     def solve(self, top_drained=True, bot_drained=True, non_linear=True, sec_order_strains=True):
 
-        # get the fixed data
-        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, ttrack, i = self.get_fixeddata()
+        # check mfactors !<0.5 before START LOOP
+        print('Factors for each layer < 0.5!')
+        mfact0 = self.ss.get_mfact0()
+        print(mfact0)
+        assert all(mfact0 < 0.5), 'Check initial mfact, mathematically unstable'
 
-        fv, f1, f2 = self.ss.get_factors()
+        # get the fixed data
+        rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, dt = self.get_fixeddata()
+        udisstot = A.copy()
+        mask_load = slice(top_drained, rows - bot_drained)
+
+        # get the initial factors for the first calculation of A
+        fv, f1, f2 = self.ss.get_factors0()
+
         factor_fun = self.get_factor_fun()
         drainvect = self.ss.get_drainvect()
 
-        udisstot = A.copy()
-        dt = self.tt.dt
-        mask_load = slice(top_drained, rows-bot_drained)
+        ttrack = 0  # ttrack = timetracker
+        i = 0  # i = column number of plotmatrix
 
-        # FOR LOOP
+        # START LOOP
         for j in range(0, cols):
 
             # add load at time t
@@ -122,6 +122,7 @@ class Model:
             # internal drainage
             for j in drainvect:
                 A[j] = self.dp  # for drainage in layer A[] = 0 insert here
+
             # save relevant vectors in plot matrix
             # so that all dt works: add 'if i<len(timelegend)'
             if ttrack >= plottimes[i]:
@@ -133,7 +134,6 @@ class Model:
             # iteration time vectors: CALCULATING NEXT TIME STEP
             # transition condition is suitable as a more general formula! (LHAP page 66)
             A[zero] = fv[zero] * (f1[zero] * A[up] - 2 * A[zero] + f2[zero] * A[lo]) + A[zero]
-
             if not bot_drained:
                 A[-1] = fv[-1] * (f1[-1] * A[-2] - 2 * A[-1] + f2[-1] * A[-2]) + A[-1]
             if not top_drained:
@@ -146,11 +146,15 @@ class Model:
             deltau = B - A  # ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
-            fv, f1, f2 = factor_fun(udisstot, sec_order_strains)
+            fv, f1, f2, cv, dzsecnd = factor_fun(udisstot, sec_order_strains)
 
             # timetracker: tt always has the unit of the current time in the iteration (-> useful for times of plots, and variable loads)
             ttrack += dt
-            #ttrack = round(ttrack, 3)  # it makes dt more robust (eliminates numerical noise which causes problems)
+        # END LOOP
+
+        # check mfactors !<0.5 after END LOOP (cv have increased generally)
+        mfact = cv * dt / dzsecnd ** 2
+        assert all(mfact < 0.5), f'Maximum final mfact (mathematically unstable): {max(mfact)}'
 
         return Solution(self.ss, plottimes, plotmatrix)
 
@@ -204,7 +208,7 @@ class Solution:
         um = self.pore_pressures
         uincrm = np.zeros(um.shape)
         sigeffm = np.zeros(um.shape)
-        sigeff0 = self.assembly.get_effsigma()
+        sigeff0 = self.assembly.get_effsigma0()
         sigeff0avg = np.zeros(sigeff0.shape)
 
         i = 0

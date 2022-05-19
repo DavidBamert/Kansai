@@ -7,20 +7,20 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw):
+    def __init__(self, hup, hlow, k, Me0, dz, gamma, Cc, e0, yw):
         self.hup = hup
         self.hlow = hlow
         self.k = k
-        self.me = me
+        self.Me0 = Me0
         self.dz = dz
         self.gamma = gamma
         self.Cc = Cc
         self.e0 = e0
         self.yw = yw
 
-    def cv(self):
-        cv = self.k * self.me / self.yw
-        return cv
+    def cv0(self):
+        cv0 = self.k * self.Me0 / self.yw
+        return cv0
 
 # vectors
     # build vector dz, with an increment that is approximately = dz (so that h can be correctly represented)
@@ -44,16 +44,16 @@ class Layer:
         kvect[:] = self.k
         return kvect
 
-    def get_cvvect(self):
-        cv = self.k * self.me / self.yw
-        cvvect = self.get_dzsummed()
-        cvvect[:] = cv
-        return cvvect
+    def get_cv0vect(self):
+        cv0 = self.k * self.Me0 / self.yw
+        cv0vect = self.get_dzsummed()
+        cv0vect[:] = cv0
+        return cv0vect
 
 # variable expansion
-    def get_effsigma(self):
-        effsigma = self.gamma * self.get_dzsummed()
-        return effsigma
+    def get_effsigma0(self):
+        effsigma0 = self.gamma * self.get_dzsummed()
+        return effsigma0
 
     def get_Cc(self):
         Ccvect = self.get_dzsummed()

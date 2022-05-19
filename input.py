@@ -18,7 +18,7 @@ scnd = False
 
 # discretizazion (don't use dt=0.3, for numerical noise reasons)
 dz = 0.1
-dt = 1e4
+dt = 2e4
 
 # time period
 Tday = 5e3
