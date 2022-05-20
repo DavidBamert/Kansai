@@ -16,7 +16,7 @@ bot = True
 # second order strains
 scnd = True
 
-# discretizazion (don't use dt=0.3, for numerical noise reasons)
+# discretization (don't use dt=0.3, for numerical noise reasons)
 dz = 1
 dt = 500
 
