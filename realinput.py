@@ -20,7 +20,7 @@ dz = 1
 dt = 500
 
 # time period
-Tday = 18250  # = 50 years
+Tday = 18250  # =50 years
 T = 86400 * Tday
 
 # layers(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw)

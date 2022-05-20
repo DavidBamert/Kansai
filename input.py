@@ -21,7 +21,7 @@ dz = 1
 dt = 500
 
 # time period
-Tday = 1e3
+Tday = 1e3  # =
 T = 86400 * Tday
 
 # layers(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw)
