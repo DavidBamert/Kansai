@@ -11,22 +11,38 @@ import numpy as np
 yw = 10
 # drainage
 top = True
-bot = True
+bot = False
 # second order strains
-scnd = True
+scnd = False
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.5
-dt = 4e3
+dz = 1
+dt = 500
 
 # time period
-Tday = 20e3
+Tday = 18250  # 50 years
 T = 86400 * Tday
 
 # layers(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw)
-L = [lm.Layer(0, 12, 1e-9, 1670, dz, 12, 0.6, 1.5, yw),
-     lm.Layer(12, 16, 1e-7, 1670, dz, 10, 0.6, 1.5, yw),
-     lm.Layer(16, 28, 1e-9, 1670, dz, 15, 0.6, 1.5, yw)
+L = [lm.Layer(0, 21, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(21, 25, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(25, 37, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(37, 41, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(41, 53, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(53, 57, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(57, 69, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(69, 73, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(73, 85, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(85, 89, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(89, 101, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(101, 105, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(105, 117, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(117, 121, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(121, 133, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(133, 137, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(137, 149, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(149, 153, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(153, 165, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)
      ]
 
 # drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
@@ -37,8 +53,7 @@ assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more d
 # loads in time tl = np.array([[time,load], ... ])
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 tl = np.array([
-    [0, 100],
-    [1.296e9, 20]
+    [0, 403]
     ])
 
 # number of graphs

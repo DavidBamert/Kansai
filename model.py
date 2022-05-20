@@ -154,7 +154,7 @@ class Model:
 
         # check mfactors !<0.5 after END LOOP (cv have increased generally)
         mfact = cv * dt / dzsecnd ** 2
-        assert all(mfact < 0.5), f'Maximum final mfact (mathematically unstable): {max(mfact)}'
+        assert all(mfact < 0.5), f"Maximum final mfact (mathematically unstable): {max(mfact)}"
 
         return Solution(self.ss, plottimes, plotmatrix)
 
@@ -278,4 +278,4 @@ class Solution:
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
-        return -settlemvectavg
+        return -np.reshape(settlemvectavg, (len(settlemvectavg), 1))
