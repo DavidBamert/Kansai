@@ -48,6 +48,15 @@ class Assembly:
             array = np.concatenate((array, b))
         return array
 
+    def get_cv0_lin(self):
+        array = np.empty((1,), float)
+        for layer in self.layerlist:
+            b = layer.get_cv0vect_lin()  # get constant cv for each different layer (linear calculation)
+            array = np.delete(array, -1, 0)
+            array = np.concatenate((array, b))
+        return array
+
+    # variable expansion for non-linear calculation
     def get_Cc(self):
         array = np.empty((1,), float)
         for layer in self.layerlist:
@@ -74,11 +83,12 @@ class Assembly:
             effsigma0low = array[-1]
         return array
 
-    def get_Me0(self):
+    def get_Me0_nonlin(self):
         Me0 = np.log(10) * (1 + self.get_e0()) * self.get_effsigma0() / self.get_Cc()
         Me0[0] = Me0[1] / 2  # adjust the most upper Me, because it must not be 0
         return Me0
 
+    # get factors for FDM
     def get_slices(self):
         # up = i-1; zero = i; lo = i+1
         rows = len(self.get_dz())
@@ -87,11 +97,14 @@ class Assembly:
         lo = slice(2, rows)
         return up, zero, lo
 
-    def get_factors0(self):
+    def get_factors0(self, non_linear):
         # needed vectors
         dz = self.get_dz()
         k = self.get_k()
-        cv0 = self.get_k() * self.get_Me0() / self.yw
+        if non_linear:
+            cv0 = self.get_k() * self.get_Me0_nonlin() / self.yw  # non-linear calculation
+        else:
+            cv0 = self.get_cv0_lin()  # linear calculation
         # length of vectors
         rows = len(self.get_dz())
         # up = i-1; zero = i; lo = i+1

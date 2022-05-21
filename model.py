@@ -97,7 +97,7 @@ class Model:
         mask_load = slice(top_drained, rows - bot_drained)
 
         # get the initial factors for the first calculation of A
-        fv, f1, f2 = self.ss.get_factors0()
+        fv, f1, f2 = self.ss.get_factors0(non_linear)
 
         factor_fun = self.get_factor_fun()
         drainvect = self.ss.get_drainvect()
@@ -146,15 +146,17 @@ class Model:
             deltau = B - A  # ppressure change
             udisstot += deltau   # summed ppressure dissipated = summed sigmaeff change
 
-            fv, f1, f2, cv, dzsecnd = factor_fun(udisstot, sec_order_strains)
+            if non_linear:
+                fv, f1, f2, cv, dzsecnd = factor_fun(udisstot, sec_order_strains)
+            #fv, f1, f2, cv, dzsecnd = factor_fun(udisstot, sec_order_strains)
 
             # timetracker: tt always has the unit of the current time in the iteration (-> useful for times of plots, and variable loads)
             ttrack += dt
         # END LOOP
-
-        # check mfactors !<0.5 after END LOOP (cv have increased generally)
-        mfact = cv * dt / dzsecnd ** 2
-        assert all(mfact < 0.5), f"Maximum final mfact (mathematically unstable): {max(mfact)}"
+        if non_linear:
+            # check mfactors !<0.5 after END LOOP (cv have increased generally)
+            mfact = cv * dt / dzsecnd ** 2
+            assert all(mfact < 0.5), f"Maximum final mfact (mathematically unstable): {max(mfact)}"
 
         return Solution(self.ss, plottimes, plotmatrix)
 

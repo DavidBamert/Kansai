@@ -19,10 +19,10 @@ class Layer:
         self.yw = yw
 
     def cv0(self):
-        cv0 = self.k * self.Me0 / self.yw
+        cv0 = self.k * self.Me0 / self.yw  # cv calculated from user-defined Me
         return cv0
 
-# vectors
+    # vectors
     # build vector dz, with an increment that is approximately = dz (so that h can be correctly represented)
     # is necessary for the plot, because dz differs from layer to layer
     def dzcorr(self):
@@ -44,17 +44,13 @@ class Layer:
         kvect[:] = self.k
         return kvect
 
-    def get_cv0vect(self):
-        cv0 = self.k * self.Me0 / self.yw
+    def get_cv0vect_lin(self):
+        cv0 = self.k * self.Me0 / self.yw  # cv calculated from user-defined Me
         cv0vect = self.get_dzsummed()
         cv0vect[:] = cv0
-        return cv0vect
+        return cv0vect  # for linear calculation
 
-# variable expansion
-    def get_effsigma0(self):
-        effsigma0 = self.gamma * self.get_dzsummed()
-        return effsigma0
-
+    # variable expansion for non-linear calculation
     def get_Cc(self):
         Ccvect = self.get_dzsummed()
         Ccvect[:] = self.Cc
@@ -64,3 +60,7 @@ class Layer:
         e0vect = self.get_dzsummed()
         e0vect[:] = self.e0
         return e0vect
+
+    def get_effsigma0(self):
+        effsigma0 = self.gamma * self.get_dzsummed()
+        return effsigma0
