@@ -27,7 +27,7 @@ Tyears = 50
 Tday = 365 * Tyears
 T = 86400 * Tday
 
-# layers(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw)
+# layers (hup, hlow, k, me, dz, gamma, Cc, e0, yw)
 L = [lm.Layer(0, 21, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
      lm.Layer(21, 25, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
      lm.Layer(25, 37, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
@@ -72,7 +72,6 @@ model = mm.Model(tl, ss, tt, uexact, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
 press = solution.plot_pressures(np.linspace(0, T, 5))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50))  # example of Urias
-
 solution.plot_U()  # reference value 'U=1' is U(t=0)
 settle = solution.plot_settlement(tl)
 

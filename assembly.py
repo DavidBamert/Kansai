@@ -123,9 +123,21 @@ class Assembly:
         f2[0], f2[-1] = f2[1], f2[-2]
         return fv, f1, f2
 
-    def get_mfact0(self):
+    def get_mfact0_lin(self):
         mfact0 = []
         for layer in self.layerlist:
             factor = layer.cv0() * self.dt / layer.dzcorr() ** 2
             mfact0.append(factor)
         return np.array(mfact0)
+
+    def get_mfact0_nonlin(self):
+        mfact0 = []
+        cv0 = self.get_k() * self.get_Me0_nonlin() / self.yw
+        factors = cv0 * self.dt / self.get_dz() ** 2
+        maxfact = max(factors)
+        mfact0.append(maxfact)
+        for i, fact in enumerate(factors):
+            if fact == maxfact:
+                maxdepth = self.get_dzsum()[i]
+
+        return np.array(mfact0), maxdepth

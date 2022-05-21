@@ -20,13 +20,13 @@ scnd = True
 
 # discretization (don't use dt=0.3, for numerical noise reasons)
 dz = 0.5
-dt = 4e3
+dt = 5e3
 
 # time period
 Tday = 20e3
 T = 86400 * Tday
 
-# layers(self, hup, hlow, k, me, dz, gamma, Cc, e0, yw)
+# layers (hup, hlow, k, Me, dz, gamma, Cc, e0, yw)
 L = [lm.Layer(0, 12, 1e-9, 1670, dz, 12, 0.6, 1.5, yw),
      lm.Layer(12, 16, 1e-7, 1670, dz, 10, 0.6, 1.5, yw),
      lm.Layer(16, 28, 1e-9, 1670, dz, 15, 0.6, 1.5, yw)
@@ -55,9 +55,7 @@ model = mm.Model(tl, ss, tt, graphs, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
 press = solution.plot_pressures(np.linspace(0, T, 5))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) # example of Urias
-
 solution.plot_U()  # reference value 'U=1' is U(t=0)
 settle = solution.plot_settlement(tl)
-
 
 print('end')

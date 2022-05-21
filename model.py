@@ -26,6 +26,7 @@ class Model:
 
         return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, dt
 
+    # function for non-linear calculation
     def get_factor_fun(self):
 
         # needed vectors
@@ -78,6 +79,7 @@ class Model:
             fv[0], fv[-1] = fv[1], fv[-2]
             f1[0], f1[-1] = f1[1], f1[-2]
             f2[0], f2[-1] = f2[1], f2[-2]
+
             return fv, f1, f2, cv, dzsecnd
         return fun
 
@@ -86,10 +88,14 @@ class Model:
     def solve(self, top_drained=True, bot_drained=True, non_linear=True, sec_order_strains=True):
 
         # check mfactors !<0.5 before START LOOP
-        print('Factors for each layer < 0.5!')
-        mfact0 = self.ss.get_mfact0()
+        if non_linear:
+            mfact0, maxdepth = self.ss.get_mfact0_nonlin()
+            print('At depth', maxdepth, 'm, max. M factor:')
+        else:
+            mfact0 = self.ss.get_mfact0_lin()
+            print('M factors for each layer')
         print(mfact0)
-        assert all(mfact0 < 0.5), 'Check initial mfact, mathematically unstable'
+        assert all(mfact0 < 0.5), 'Initial mfact > 0.5, mathematically unstable!'
 
         # get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, dt = self.get_fixeddata()
@@ -148,15 +154,19 @@ class Model:
 
             if non_linear:
                 fv, f1, f2, cv, dzsecnd = factor_fun(udisstot, sec_order_strains)
-            #fv, f1, f2, cv, dzsecnd = factor_fun(udisstot, sec_order_strains)
 
             # timetracker: tt always has the unit of the current time in the iteration (-> useful for times of plots, and variable loads)
             ttrack += dt
         # END LOOP
+
+        # check mfactors !<0.5 after END LOOP (cv have increased in non-linear case)
         if non_linear:
-            # check mfactors !<0.5 after END LOOP (cv have increased generally)
             mfact = cv * dt / dzsecnd ** 2
-            assert all(mfact < 0.5), f"Maximum final mfact (mathematically unstable): {max(mfact)}"
+            maxfact = max(mfact)
+            for i, fact in enumerate(mfact):
+                if fact == maxfact:
+                    maxdepth = self.ss.get_dzsum()[i]
+            assert all(mfact < 0.5), f"At depth {maxdepth} m, maximum final mfact {maxfact}!"
 
         return Solution(self.ss, plottimes, plotmatrix)
 
