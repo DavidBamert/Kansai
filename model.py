@@ -263,9 +263,9 @@ class Solution:
         evolmavg = np.zeros(sigeffmavg.shape)
         i = 0
         Cc = self.assembly.get_Cc()
-        e = self.assembly.get_e0()
+        e0 = self.assembly.get_e0()
         for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
-            evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e[:-1])
+            evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e0[:-1])
             i += 1
 
         settlemmavg = np.zeros(um.shape)

@@ -12,18 +12,18 @@ import numpy as np
 yw = 10
 # drainage
 top = True
-bot = True
+bot = False
 # non-linearity
 nonlin = True
 # second order strains
-scnd = True
+scnd = False
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 1
 dt = 500
 
 # time period
-Tyears = 50
+Tyears = 100
 Tday = 365 * Tyears
 T = 86400 * Tday
 
@@ -54,6 +54,9 @@ drainage = []
 dp = 0  # could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
+# overburden pressure upon the modeled layers
+ob = 200
+
 # loads in time tl = np.array([[time,load], ... ])
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 tl = np.array([
@@ -64,7 +67,7 @@ tl = np.array([
 uexact = 101  # number of exact solution u-vectors for U, Settlement s and the interpolation function
 
 # create assembly and timee object
-ss = am.Assembly(L, dt, drainage, yw)
+ss = am.Assembly(L, dt, drainage, ob, yw)
 tt = tm.Time(T, dt)
 
 # solve the model using FDM

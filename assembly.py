@@ -7,10 +7,11 @@ import numpy as np
 
 
 class Assembly:
-    def __init__(self, layerlist, dt, drainage, yw):
+    def __init__(self, layerlist, dt, drainage, ob, yw):
         self.layerlist = layerlist
         self.dt = dt
         self.drainage = drainage
+        self.ob = ob
         self.yw = yw
 
     def get_drainvect(self):
@@ -81,6 +82,7 @@ class Assembly:
             array = np.delete(array, -1, 0)
             array = np.concatenate((array, b))
             effsigma0low = array[-1]
+        array += self.ob
         return array
 
     def get_Me0_nonlin(self):
