@@ -14,7 +14,7 @@ yw = 10
 top = True
 bot = False
 # non-linearity
-nonlin = True
+nonlin = False
 # second order strains
 scnd = False
 
@@ -23,31 +23,34 @@ dz = 1
 dt = 500
 
 # time period
-Tyears = 100
+Tyears = 1
 Tday = 365 * Tyears
 T = 86400 * Tday
 
 # layers (hup, hlow, k, me, dz, gamma, Cc, e0, yw)
-L = [lm.Layer(0, 21, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(21, 25, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(25, 37, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(37, 41, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(41, 53, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(53, 57, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(57, 69, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(69, 73, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(73, 85, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(85, 89, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(89, 101, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(101, 105, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(105, 117, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(117, 121, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(121, 133, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(133, 137, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(137, 149, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(149, 153, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(153, 165, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)
+L = [lm.Layer(0, 17.5, 1e-8, 1670, dz, 5, 0.6, 1.5, yw),
+     lm.Layer(17.5, 30, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(30, 32.5, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(32.5, 43, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(43, 50.5, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(50.5, 55, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(55, 57, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(57, 61, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(61, 62.5, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(62.5, 82, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(82, 86.5, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(86.5, 94, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(94, 99, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(99, 103, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(103, 106, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(106, 111, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(111, 118, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(118, 120, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(120, 131, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
+     lm.Layer(131, 157, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
+     lm.Layer(157, 172, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
      ]
+
 
 # drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
 drainage = []
@@ -55,12 +58,12 @@ dp = 0  # could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
 # overburden pressure upon the modeled layers
-ob = 200
+ob = 0
 
 # loads in time tl = np.array([[time,load], ... ])
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 tl = np.array([
-    [0, 403]
+    [0, 40]
     ])
 
 # number of graphs
@@ -73,7 +76,7 @@ tt = tm.Time(T, dt)
 # solve the model using FDM
 model = mm.Model(tl, ss, tt, uexact, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
-press = solution.plot_pressures(np.linspace(0, T, 5))
+press = solution.plot_pressures(np.linspace(0, T, 100))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50))  # example of Urias
 solution.plot_U()  # reference value 'U=1' is U(t=0)
 settle = solution.plot_settlement(tl)

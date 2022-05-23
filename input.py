@@ -19,46 +19,52 @@ nonlin = True
 scnd = False
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 1
-dt = 500
+dz = 0.5
+dt = 10
 
 # time period
-Tyears = 100
-Tday = 100 #365 * Tyears
+Tyears = 10
+Tday = 365 * Tyears
 T = 86400 * Tday
 
+maxk = 1e-6
+
 # layers (hup, hlow, k, Me, dz, gamma, Cc, e0, yw)
-L = [lm.Layer(0, 12, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(12, 16, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(16, 28, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(28, 32, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(32, 44, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(44, 48, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(48, 60, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(60, 64, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(64, 76, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(76, 80, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(80, 92, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(92, 96, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(96, 108, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(108, 112, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(112, 124, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(124, 128, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(128, 140, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)
+L = [lm.Layer(0,    17.5,  8.44e-8, 1670, dz, 5.1, 0.69, 2.30, yw),
+     lm.Layer(17.5, 30,       maxk, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(30,   32.5,  1.35e-9, 1670, dz, 6.7, 0.43, 1.19, yw),
+     lm.Layer(32.5, 43,   7.33e-10, 1670, dz, 5.5, 0.72, 1.78, yw),
+     lm.Layer(43,   50.5,     maxk, 1670, dz,   6, 0.03, 0.40, yw),
+     lm.Layer(50.5, 55,   4.45e-10, 1670, dz, 6.5, 0.54, 1.31, yw),
+     lm.Layer(55,   57,       maxk, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(57,   61,    8.2e-10, 1670, dz, 6.7, 0.54, 1.33, yw),
+     lm.Layer(61,   62.5,     maxk, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(62.5, 82,    6.2e-10, 1670, dz, 6.5, 0.70, 1.42, yw),
+     lm.Layer(82,   86.5,     maxk, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(86.5, 94,   4.55e-10, 1670, dz, 6.5, 0.72, 1.43, yw),
+     lm.Layer(94,   99,       maxk, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(99,   103,   3.4e-10, 1670, dz, 5.8, 0.76, 1.51, yw),
+     lm.Layer(103,  106,      maxk, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(106,  111,     6e-10, 1670, dz, 7.1, 0.61, 1.29, yw),
+     lm.Layer(111,  118,      1e-7, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(118,  120,  3.43e-10, 1670, dz, 6.7, 0.69, 1.30, yw),
+     lm.Layer(120,  131,     4e-10, 1670, dz, 6.5, 0.03, 0.40, yw),
+     lm.Layer(131,  157,   3.8e-10, 1670, dz, 6.7, 0.69, 1.24, yw),
+     lm.Layer(157,  172,   2.4e-10, 1670, dz, 6.4, 0.69, 0.82, yw),
      ]
 
 # drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
-drainage = []
+drainage = [18, 19]
 dp = 0  # could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
 # overburden pressure upon the modeled layers
-ob = 200
+ob = 0
 
 # loads in time tl = np.array([[time,load], ... ])
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 tl = np.array([
-    [0, 403]
+    [0, 20]
     ])
 
 # number of graphs

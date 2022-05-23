@@ -95,7 +95,7 @@ class Model:
             mfact0 = self.ss.get_mfact0_lin()
             print('M factors for each layer')
         print(mfact0)
-        assert all(mfact0 < 0.5), 'Initial mfact > 0.5, mathematically unstable!'
+        #assert all(mfact0 < 0.5), 'Initial mfact > 0.5, mathematically unstable!'
 
         # get the fixed data
         rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, dt = self.get_fixeddata()
@@ -212,6 +212,8 @@ class Solution:
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
+        Uvector = 1 - Uvector
+        return Uvector
 
     # settlement interpolated approach
     def plot_settlement(self, tl, top_drained=True, bot_drained=True):
