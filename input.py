@@ -14,37 +14,37 @@ yw = 10
 top = True
 bot = True
 # non-linearity
-nonlin = False
+nonlin = True
 # second order strains
 scnd = False
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 1
-dt = 500
+dz = 0.5
+dt = 10
 
 # time period
 Tyears = 100
-Tday = 365 * Tyears
+Tday = 100 #365 * Tyears
 T = 86400 * Tday
 
 # layers (hup, hlow, k, Me, dz, gamma, Cc, e0, yw)
-L = [lm.Layer(0, 12, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(12, 16, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(16, 28, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(28, 32, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(32, 44, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(44, 48, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(48, 60, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(60, 64, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(64, 76, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(76, 80, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(80, 92, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(92, 96, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(96, 108, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(108, 112, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(112, 124, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
-     lm.Layer(124, 128, 1e-7, 1670, dz, 8, 0.1, 1.5, yw),
-     lm.Layer(128, 140, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)
+L = [lm.Layer(0,    12, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(12,   16, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(16,   28, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(28,   32, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(32,   44, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(44,   48, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(48,   60, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(60,   64, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(64,   76, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(76,   80, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(80,   92, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(92,   96, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(96,  108, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(108, 112, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(112, 124, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
+     lm.Layer(124, 128, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
+     lm.Layer(128, 140, 1e-9, 1670, dz, 8,  0.6, 1.5, yw)  # 17
      ]
 
 # drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
