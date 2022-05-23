@@ -12,9 +12,9 @@ import numpy as np
 yw = 10
 # drainage
 top = True
-bot = False
+bot = True
 # non-linearity
-nonlin = True
+nonlin = False
 # second order strains
 scnd = False
 
@@ -24,7 +24,7 @@ dt = 500
 
 # time period
 Tyears = 100
-Tday = 100 #365 * Tyears
+Tday = 365 * Tyears
 T = 86400 * Tday
 
 # layers (hup, hlow, k, Me, dz, gamma, Cc, e0, yw)
@@ -48,7 +48,7 @@ L = [lm.Layer(0, 12, 1e-9, 1670, dz, 8, 0.6, 1.5, yw),
      ]
 
 # drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
-drainage = []
+drainage = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
 dp = 0  # could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
