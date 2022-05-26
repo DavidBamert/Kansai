@@ -166,6 +166,7 @@ class Model:
             for i, fact in enumerate(mfact):
                 if fact == maxfact:
                     maxdepth = self.ss.get_dzsum()[i]
+            print('At depth', maxdepth, 'm, max. M factor:', maxfact)
             assert all(mfact < 0.5), f"At depth {maxdepth} m, maximum final mfact {maxfact}!"
 
         return Solution(self.ss, plottimes, plotmatrix)
@@ -212,9 +213,8 @@ class Solution:
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
-
     # settlement interpolated approach
-    def plot_settlement(self, tl, top_drained=True, bot_drained=True):
+    def plot_settlement(self, tl, top_drained=True, bot_drained=True, non_linear=True):
         self.tl = tl
 
         um = self.pore_pressures
@@ -230,10 +230,12 @@ class Solution:
 
         i = 1
         for counter in um[0, 1:]:  # calculate uincrements
-            if any(um[:, i - 1] - um[:, i] < 0):
-                uincrm[:, i] = 0
-            else:
-                uincrm[:, i] = um[:, i - 1] - um[:, i]
+            uincrm[:, i] = um[:, i - 1] - um[:, i]
+            if any(uincrm[:, i] < 0):
+                for idx, n in enumerate(uincrm[:, i]):
+                    if uincrm[idx, i] < 0:
+                        uincrm[idx, i] = 0  # correction just at the depth where uincrm<0
+
             i += 1
 
         sigeffm[:, 0] = sigeff0
@@ -262,11 +264,17 @@ class Solution:
 
         evolmavg = np.zeros(sigeffmavg.shape)
         i = 0
-        Cc = self.assembly.get_Cc()
-        e0 = self.assembly.get_e0()
-        for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
-            evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e0[:-1])
-            i += 1
+        if non_linear:
+            Cc = self.assembly.get_Cc()
+            e0 = self.assembly.get_e0()
+            for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
+                evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e0[:-1])
+                i += 1
+        else:
+            Me0 = self.assembly.get_Me0_lin()
+            for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
+                evolmavg[:-1, i] = (sigeffmavg[:-1, i] - sigeff0avg[:-1]) / Me0[:-1]
+                i += 1
 
         settlemmavg = np.zeros(um.shape)
         i = 0

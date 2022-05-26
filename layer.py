@@ -44,8 +44,13 @@ class Layer:
         kvect[:] = self.k
         return kvect
 
+    def get_Me0vect(self):
+        Me0vect = self.get_dzsummed()
+        Me0vect[:] = self.Me0
+        return Me0vect
+
     def get_cv0vect_lin(self):
-        cv0 = self.k * self.Me0 / self.yw  # cv calculated from user-defined Me
+        cv0 = self.k * self.Me0 / self.yw  # cv calculated from user-defined Me0
         cv0vect = self.get_dzsummed()
         cv0vect[:] = cv0
         return cv0vect  # for linear calculation

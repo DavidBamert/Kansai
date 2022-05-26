@@ -49,6 +49,14 @@ class Assembly:
             array = np.concatenate((array, b))
         return array
 
+    def get_Me0_lin(self):
+        array = np.empty((1,), float)
+        for layer in self.layerlist:
+            b = layer.get_Me0vect()
+            array = np.delete(array, -1, 0)
+            array = np.concatenate((array, b))
+        return array
+
     def get_cv0_lin(self):
         array = np.empty((1,), float)
         for layer in self.layerlist:

@@ -16,15 +16,15 @@ bot = False
 # non-linearity
 nonlin = True
 # second order strains
-scnd = False
+scnd = True
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
 dz = 0.5
-dt = 10
+dt = 50
 
 # time period
 Tyears = 100
-Tday = 365 * Tyears
+Tday = 1000 #365 * Tyears
 T = 86400 * Tday
 
 maxk = 1e-7
@@ -65,7 +65,13 @@ ob = 0
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 ts = 86400  # seconds in one day
 tl = np.array([
-     [0, 460]
+     [0,        30],
+     [175*ts,   30],
+     [655*ts,  115],
+     [1075*ts,  40],
+     [1195*ts, 140],
+     [1255*ts,  60],
+     [1855*ts,  45]
     ])
 
 # number of graphs
@@ -78,9 +84,9 @@ tt = tm.Time(T, dt)
 # solve the model using FDM
 model = mm.Model(tl, ss, tt, uexact, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
-press = solution.plot_pressures(np.linspace(0, T, 5))
+umatrix = solution.plot_pressures(np.linspace(0, T, 11))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50))  # example of Urias
 solution.plot_U()  # reference value 'U=1' is U(t=0)
-settle = solution.plot_settlement(tl)
+settlementvect = solution.plot_settlement(tl)
 
 print('end')

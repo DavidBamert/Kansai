@@ -14,19 +14,20 @@ yw = 10
 top = True
 bot = True
 # non-linearity
-nonlin = True
+nonlin = False
 # second order strains
 scnd = False
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.5
-dt = 10
+dz = 0.1
+dt = 1e3
 
 # time period
-Tyears = 100
-Tday = 100 #365 * Tyears
+Tyears = 20
+Tday = 2000 #365 * Tyears
 T = 86400 * Tday
-
+L = [lm.Layer(0, 12, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)]
+"""
 # layers (hup, hlow, k, Me, dz, gamma, Cc, e0, yw)
 L = [lm.Layer(0,    12, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
      lm.Layer(12,   16, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
@@ -46,19 +47,19 @@ L = [lm.Layer(0,    12, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
      lm.Layer(124, 128, 1e-7,  1e5, dz, 8, 0.03, 0.4, yw),
      lm.Layer(128, 140, 1e-9, 1670, dz, 8,  0.6, 1.5, yw)  # 17
      ]
-
+"""
 # drainage inside the Layerassembly [1, 2, 3,....] (not more than layers-1 and >0)
-drainage = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+drainage = []
 dp = 0  # could be the waterpressure of a injection 'drainagepressure'
 assert all(np.array(drainage) < len(L)) and all(np.array(drainage) > 0), 'more drainages than Layers-1'
 
 # overburden pressure upon the modeled layers
-ob = 200
+ob = 0
 
 # loads in time tl = np.array([[time,load], ... ])
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 tl = np.array([
-    [0, 403]
+    [0, 100]
     ])
 
 # number of graphs
@@ -71,9 +72,9 @@ tt = tm.Time(T, dt)
 # solve the model using FDM
 model = mm.Model(tl, ss, tt, graphs, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
-press = solution.plot_pressures(np.linspace(0, T, 11))
+umatrix = solution.plot_pressures(np.linspace(0, T, 2))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) # example of Urias
 solution.plot_U()  # reference value 'U=1' is U(t=0)
-settle = solution.plot_settlement(tl)
+settlementvect = solution.plot_settlement(tl)
 
 print('end')
