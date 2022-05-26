@@ -216,18 +216,16 @@ class Solution:
     # settlement interpolated approach
     def plot_settlement(self, tl, top_drained=True, bot_drained=True, non_linear=True):
         self.tl = tl
-
         um = self.pore_pressures
-        uincrm = np.zeros(um.shape)
-        sigeffm = np.zeros(um.shape)
         sigeff0 = self.assembly.get_effsigma0()
-        sigeff0avg = np.zeros(sigeff0.shape)
 
+        sigeff0avg = np.zeros(sigeff0.shape)
         i = 0
         for counter in sigeff0[:-1]:
             sigeff0avg[i] = (sigeff0[i] + sigeff0[i + 1]) / 2
             i += 1
 
+        uincrm = np.zeros(um.shape)
         i = 1
         for counter in um[0, 1:]:  # calculate uincrements
             uincrm[:, i] = um[:, i - 1] - um[:, i]
@@ -235,9 +233,9 @@ class Solution:
                 for idx, n in enumerate(uincrm[:, i]):
                     if uincrm[idx, i] < 0:
                         uincrm[idx, i] = 0  # correction just at the depth where uincrm<0
-
             i += 1
 
+        sigeffm = np.zeros(um.shape)
         sigeffm[:, 0] = sigeff0
         i = 1
         for counter in um[0, 1:]:  # calculate sigeff at time t
@@ -270,7 +268,7 @@ class Solution:
             for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
                 evolmavg[:-1, i] = Cc[:-1] * np.log10(sigeffmavg[:-1, i]/sigeff0avg[:-1]) / (1 + e0[:-1])
                 i += 1
-        else:
+        if not non_linear:
             Me0 = self.assembly.get_Me0_lin()
             for counter in evolmavg[0, :]:  # only up to :-1 because the last entry is not necessary
                 evolmavg[:-1, i] = (sigeffmavg[:-1, i] - sigeff0avg[:-1]) / Me0[:-1]
@@ -283,7 +281,6 @@ class Solution:
             i += 1
 
         settlemvectavg = np.zeros(self.times.shape)
-
         i = 0
         for counter in settlemmavg[0, :]:
             settlemvectavg[i] = sum(settlemmavg[:, i])

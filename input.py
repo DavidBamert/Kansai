@@ -75,6 +75,6 @@ solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_
 umatrix = solution.plot_pressures(np.linspace(0, T, 2))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) # example of Urias
 solution.plot_U()  # reference value 'U=1' is U(t=0)
-settlementvect = solution.plot_settlement(tl)
+settlementvect = solution.plot_settlement(tl, top_drained=top, bot_drained=bot, non_linear=nonlin)
 
 print('end')
