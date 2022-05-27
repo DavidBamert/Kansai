@@ -74,19 +74,19 @@ tl = np.array([
      [1855*ts,  45]
     ])
 
-# number of graphs
-uexact = 101  # number of exact solution u-vectors for U, Settlement s and the interpolation function
+store = 101  # number of exact solution u-vectors, settlement s and the interpolation function
+isochrones = 11  # number of isochrones displayed in the plot
 
 # create assembly and timee object
 ss = am.Assembly(L, dt, drainage, ob, yw)
 tt = tm.Time(T, dt)
 
 # solve the model using FDM
-model = mm.Model(tl, ss, tt, uexact, dp, yw)
+model = mm.Model(tl, ss, tt, store, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
-umatrix = solution.plot_pressures(np.linspace(0, T, 11))
+umatrix = solution.plot_pressures(np.linspace(0, T, isochrones))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50))  # example of Urias
-solution.plot_U()  # reference value 'U=1' is U(t=0)
+UatT = solution.plot_U()  # reference value 'U=1' is U(t=0)
 settlementvect = solution.plot_settlement(tl, top_drained=top, bot_drained=bot, non_linear=nonlin)
 
 print('end')

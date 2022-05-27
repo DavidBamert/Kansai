@@ -18,8 +18,8 @@ class Time:
     # plottimes: save vector A as soon as tt >= plottime
     # plotmatrix: here the vector A is saved
     # timelegend: here the precise time is saved (this is not always equal to plottimes)
-    def get_plotmatrix(self, rows, graphs):
-        plottimes = np.linspace(0, self.T, graphs)  # here the amount of saved vectors can be chosen
+    def get_plotmatrix(self, rows, store):
+        plottimes = np.linspace(0, self.T, store)  # here the amount of saved vectors can be chosen
         plotmatrix = np.zeros((rows, len(plottimes)))
         timelegend = np.zeros((len(plottimes), 1))
         return plottimes, plotmatrix, timelegend

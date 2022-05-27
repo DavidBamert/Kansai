@@ -19,14 +19,14 @@ nonlin = False
 scnd = False
 
 # discretizazion (dont use dt=0.3, for numerical noise reasons)
-dz = 0.1
-dt = 1e3
+dz = 0.05
+dt = 10
 
 # time period
 Tyears = 20
 Tday = 2000 #365 * Tyears
-T = 86400 * Tday
-L = [lm.Layer(0, 12, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)]
+T = 5389220 #86400 * Tday
+L = [lm.Layer(0, 2, 1e-9, 1670, dz, 8, 0.6, 1.5, yw)]
 """
 # layers (hup, hlow, k, Me, dz, gamma, Cc, e0, yw)
 L = [lm.Layer(0,    12, 1e-9, 1670, dz, 8,  0.6, 1.5, yw),
@@ -59,22 +59,22 @@ ob = 0
 # loads in time tl = np.array([[time,load], ... ])
 # the matrix can be freely expanded, the entry [0,1] can replace the initial conditions
 tl = np.array([
-    [0, 100]
+    [0, 1]
     ])
 
-# number of graphs
-graphs = 101  # number of exact solution u-vectors for U, Settlement s and the interpolation function
+store = 101  # number of exact solution u-vectors, settlement s and the interpolation function
+isochrones = 2  # number of isochrones displayed in the plot
 
 # create assembly and timee object
 ss = am.Assembly(L, dt, drainage, ob, yw)
 tt = tm.Time(T, dt)
 
 # solve the model using FDM
-model = mm.Model(tl, ss, tt, graphs, dp, yw)
+model = mm.Model(tl, ss, tt, store, dp, yw)
 solution = model.solve(top_drained=top, bot_drained=bot, non_linear=nonlin, sec_order_strains=scnd)
-umatrix = solution.plot_pressures(np.linspace(0, T, 2))
+umatrix = solution.plot_pressures(np.linspace(0, T, isochrones))
 #solution.plot_pressures(np.linspace(0, T, 10), np.linspace(10, 20, 50)) # example of Urias
-solution.plot_U()  # reference value 'U=1' is U(t=0)
+UatT = solution.plot_U()  # reference value 'U=1' is U(t=0)
 settlementvect = solution.plot_settlement(tl, top_drained=top, bot_drained=bot, non_linear=nonlin)
 
 print('end')

@@ -4,11 +4,11 @@ from scipy.interpolate import interp2d
 
 
 class Model:
-    def __init__(self, tl, ss, tt, graphs, dp, yw):
+    def __init__(self, tl, ss, tt, store, dp, yw):
         self.tl = tl
         self.ss = ss
         self.tt = tt
-        self.graphs = graphs
+        self.store = store
         self.dp = dp
         self.yw = yw
 
@@ -21,7 +21,7 @@ class Model:
         up, zero, lo = self.ss.get_slices()
         # get time discretization and plot
         cols = self.tt.get_cols()
-        plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.graphs)
+        plottimes, plotmatrix, timelegend = self.tt.get_plotmatrix(rows, self.store)
         dt = self.tt.dt
 
         return rows, A, up, zero, lo, cols, plottimes, plotmatrix, timelegend, dt
@@ -91,7 +91,7 @@ class Model:
         if non_linear:
             mfact0, maxdepth = self.ss.get_mfact0_nonlin()
             print('At depth', maxdepth, 'm, max. M factor:')
-        else:
+        if not non_linear:
             mfact0 = self.ss.get_mfact0_lin()
             print('M factors for each layer')
         print(mfact0)
@@ -182,13 +182,16 @@ class Solution:
         if plot_depths is None:
             plot_depths = self.assembly.get_dzsum()
 
+        #
         plot_pressures = interp2d(self.times, self.assembly.get_dzsum(), self.pore_pressures)(plot_times, plot_depths)
+
         plt.plot(plot_pressures, -plot_depths, label=plot_times)
         plt.xlabel("Excess pore water pressure [kPa]")
         plt.ylabel("Depth [m]")
         plt.title('u(t)-z diagram')
         plt.legend(loc=4, prop={'size': 6})
         plt.show()
+
         return -plot_pressures
 
     def plot_U(self):
@@ -204,6 +207,8 @@ class Solution:
             Uvector[i] = ut/ut0
             i += 1
 
+        UatT = 1 - Uvector[-1]  # final consolidation degree at time T
+
         plt.plot(self.times, 1-Uvector, label='U')
         plt.ylim([0, 1])
         plt.gca().invert_yaxis()
@@ -212,6 +217,8 @@ class Solution:
         plt.title('U(t)')
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
+
+        return UatT
 
     # settlement interpolated approach
     def plot_settlement(self, tl, top_drained=True, bot_drained=True, non_linear=True):
@@ -286,8 +293,10 @@ class Solution:
             settlemvectavg[i] = sum(settlemmavg[:, i])
             i += 1
 
+        settlementvect = -np.reshape(settlemvectavg, (len(settlemvectavg), 1))  # vector of settlement time history
+
         plt.plot(self.times, -settlemvectavg, label='Settlement [m]')
-        plt.ylim([0, -settlemvectavg[-1] - 0.1])
+        plt.ylim([0, -settlemvectavg[-1]])
         plt.gca().invert_yaxis()
         plt.xlabel("Time [s]")
         plt.ylabel("Settlement [m]")
@@ -295,4 +304,4 @@ class Solution:
         plt.legend(loc=1, prop={'size': 6})
         plt.show()
 
-        return -np.reshape(settlemvectavg, (len(settlemvectavg), 1))
+        return settlementvect

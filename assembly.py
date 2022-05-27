@@ -113,7 +113,7 @@ class Assembly:
         k = self.get_k()
         if non_linear:
             cv0 = self.get_k() * self.get_Me0_nonlin() / self.yw  # non-linear calculation
-        else:
+        if not non_linear:
             cv0 = self.get_cv0_lin()  # linear calculation
         # length of vectors
         rows = len(self.get_dz())
